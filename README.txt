@@ -13,6 +13,7 @@ Switches: [/SPT:S] [/HEADS:H] [/LOG] [/BOOT[:OS]] [/NOTACTIVE] [/R] [/CON]
 Use 4:    MKFATIMG.G4B FILE /COPY [/CON] [/Q|/T]
 Help:     MKFATIMG.G4B /?|--?|?
 
+
 Features
 Make floppie or harddrive images with FAT filesystem
 Make FAT filesystem on grub4dos ram-disk: (rd)
