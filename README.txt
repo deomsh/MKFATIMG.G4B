@@ -22,11 +22,12 @@ Size can be set in (k/m/g) bytes, in sectors or with C/H/S
 Geometry auto, switches to set Number of Heads/ Sectors per Track
 IMG-type auto (below 4MB floppy, above MBR-harddrive) or with switch
 FAT-type auto (<16MB: FAT12, <512MB: FAT16, above FAT32) or with switch
-FAT-Volumename with switch (has valid time/ date)
+Always MS-DOS uuid written
+FAT-Volumename written with switch (has valid time/ date)
 Boot-code with switch (many boot-codes onboard, default MS-DOS)
 Switch to set logical partition (boot-code can be added)
-Files can be copied to ram-disk before making image-file
-Quiet operation with switch
+Files can be copied to grub4dos ram-disk before making image-file
+Quiet operation possible with switch
 For maximum compatibily on hardrive always one empty test cylinder set
 Switch to make predefined floppies (more than 60 in range 4KB-240MB)
 Switch to make IBM PC AT/ PS/2 Harddisk Types 1-14/ 16-44 
@@ -34,8 +35,8 @@ Switch to set Sectors per Cluster
 Switch to set Reserved Sectors (>=32 on FAT32)
 Switch to set Root Directory Entries (FAT12/ FAT16)
 Experimental switch to force contiguous image
-More switches for special purposes
-Copy files to ram-disk using grubutil FAT with target on
+More switches available for special purposes
+Copy files to ram-disk using Grubutil FAT with target on
  Floppie: (rd)/
  Hardrive: (rd,0)/ or (rd,4)/ on grub4dos; (rd)/ on grub4dos for UEFI
 
