@@ -15,8 +15,8 @@ Help:     MKFATIMG.G4B /?|--?|?
 
 
 Features
-Make floppie or harddrive images with FAT filesystem
-Make FAT filesystem on grub4dos ram-disk: (rd)
+Make floppie or harddrive images with FAT filesystem (image-creation on FAT device only)
+Make full FAT filesystem on grub4dos ram-disk: (rd)
 Always preview with fat-info on (rd)
 Size can be set in (k/m/g) bytes, in sectors or with C/H/S
 Geometry auto, switches to set Number of Heads/ Sectors per Track
