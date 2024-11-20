@@ -59,7 +59,7 @@ Copy ram-disk afterwards to image file (see 'Use 4' above)
 History
 V0.4:
 Long File Names supported if Libraries are present
-Switch '/ROOTENTR:n' with predifined floppies too (switch '/F:floppysize')
+Switch '/ROOTENTR:n' with predefined floppies too (switch '/F:floppysize')
 Rootentries set to 240 on all predefined floppies >1440k <=3840k for
  compatibility with MS-DOS <=6.22
 Lowest base memory of ram-disk: 64m, Default now 256m
