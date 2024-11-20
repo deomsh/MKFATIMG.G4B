@@ -1,11 +1,11 @@
-MKFATIMG.G4B v0.3 (20240728), by deomsh
+MKFATIMG.G4B v0.4 (20241120), by deomsh
 Use 1:    MKFATIMG.G4B --size=n|--sectors=N|--CHS=C/H/S FILE switches
 Switches: [/HDD|/FDD] [/FAT12|/FAT16|/FAT32] [/V:VOLUMENAME] [/BOOT[:OS]]
           [/NOTACTIVE] [/LOG] [/CON] [/R] [/SPT:S] [/HEADS:H] [/ROOTENTR:n]
           [/RSRV:n] [/SPC:N] [/NOTRM] [/FHD] [/RDBASE:n] [/Q|/T]
 Use 2:    MKFATIMG.G4B FILE /F:floppysize switches
 Switches: [/V:VOLUMENAME] [/BOOT[:OS]] [/FAT16|/FAT32] [/CON] [/RSRV:n]
-          [/FHD] [/RDBASE:n] [/Q|/T]
+          [/ROOTENTR:n] [/FHD] [/RDBASE:n] [/Q|/T]
 Use 3:    MKFATIMG.G4B FILE /D:disktype switches
 Switches: [/SPT:S] [/HEADS:H] [/LOG] [/BOOT[:OS]] [/NOTACTIVE] [/R] [/CON]
           [/FAT12|/FAT16|/FAT32] [/V:VOLUMENAME] [/ROOTENTR:n] [/RSRV:n]
@@ -39,6 +39,8 @@ More switches available for special purposes
 Copy files to ram-disk using Grubutil FAT with target on
  Floppie: (rd)/
  Hardrive: (rd,0)/ or (rd,4)/ on grub4dos; (rd)/ on grub4dos for UEFI
+Long File Names: Libraries FATLFN.LLL and ATTRIBFT.LLL needed in
+ same locations as Grubutil FAT (if not found 8+3 Short File Names only)
 
 Compatibility
 Grub4dos version 2017-08-30 or higher
@@ -46,6 +48,18 @@ Compatible with Grub4dos for UEFI
 Grubutil FAT needed in (bd)/%~d0: /, /grub, /boot/grub, /g4dll or current root
  Use FAT version from 2023, april or later for writing images >2GB
 
+Loosely Linked Libraries: 
+FATLFN.LLL (>=v0.3): https://github.com/deomsh/FATLFN
+ATTRIBFT.LLL (>=v0.9): https://github.com/deomsh/ATTRIBFT.LLL
 
 History
+V0.4:
+Long File Names supported if Libraries are present
+Switch '/ROOTENTR:n' with predifined floppies too (switch '/F:floppysize')
+Rootentries set to 240 on all predefined floppies >1440k <=3840k for
+ compatibility with MS-DOS <=6.22
+Lowest base memory of ram-disk: 64m, Default now 256m
+OEM-name added to fat-info
+New bootcodes: MSDOS33 and MSDOS40 (in PBR)
+
 V0.3: first published version
