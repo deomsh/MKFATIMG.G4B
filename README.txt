@@ -11,7 +11,7 @@ Switches: [/SPT:S] [/HEADS:H] [/LOG] [/BOOT[:OS]] [/NOTACTIVE] [/R] [/CON]
           [/FAT12|/FAT16|/FAT32] [/V:VOLUMENAME] [/ROOTENTR:n] [/RSRV:n]
           [/RDBASE:n] [/Q|/T]
 Use 4:    MKFATIMG.G4B FILE /COPY [/CON] [/Q|/T]
-Help:     MKFATIMG.G4B /?|--?|?
+Help:     MKFATIMG.G4B [/?|--?|?]
 
 
 Features
@@ -51,6 +51,10 @@ Grubutil FAT needed in (bd)/%~d0: /, /grub, /boot/grub, /g4dll or current root
 Loosely Linked Libraries: 
 FATLFN.LLL (>=v0.3): https://github.com/deomsh/FATLFN
 ATTRIBFT.LLL (>=v0.9): https://github.com/deomsh/ATTRIBFT.LLL
+
+Copy MS-DOS system files to ram-disk first:
+Use COPYSYS.G4B: https://github.com/deomsh/COPYSYS.G4B
+Copy ram-disk afterwards to image file (see 'Use 4' above)
 
 History
 V0.4:
