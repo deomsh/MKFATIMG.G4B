@@ -1,16 +1,16 @@
-MKFATIMG.G4B v0.4 (20241120), by deomsh
+MKFATIMG.G4B v0.5 (20250203), by deomsh
 Use 1:    MKFATIMG.G4B --size=n|--sectors=N|--CHS=C/H/S FILE switches
 Switches: [/HDD|/FDD] [/FAT12|/FAT16|/FAT32] [/V:VOLUMENAME] [/BOOT[:OS]]
           [/NOTACTIVE] [/LOG] [/CON] [/R] [/SPT:S] [/HEADS:H] [/ROOTENTR:n]
-          [/RSRV:n] [/SPC:N] [/NOTRM] [/FHD] [/RDBASE:n] [/Q|/T]
+          [/RSRV:n] [/SPC:N] [/NOTRM] [/FHD] [/RDBASE:n] [/Q|/T] [/Y]
 Use 2:    MKFATIMG.G4B FILE /F:floppysize switches
 Switches: [/V:VOLUMENAME] [/BOOT[:OS]] [/FAT16|/FAT32] [/CON] [/RSRV:n]
-          [/ROOTENTR:n] [/FHD] [/RDBASE:n] [/Q|/T]
+          [/ROOTENTR:n] [/FHD] [/RDBASE:n] [/Q|/T] [/Y]
 Use 3:    MKFATIMG.G4B FILE /D:disktype switches
 Switches: [/SPT:S] [/HEADS:H] [/LOG] [/BOOT[:OS]] [/NOTACTIVE] [/R] [/CON]
           [/FAT12|/FAT16|/FAT32] [/V:VOLUMENAME] [/ROOTENTR:n] [/RSRV:n]
-          [/RDBASE:n] [/Q|/T]
-Use 4:    MKFATIMG.G4B FILE /COPY [/CON] [/Q|/T]
+          [/RDBASE:n] [/Q|/T] [/Y]
+Use 4:    MKFATIMG.G4B FILE /COPY [/CON] [/Q|/T] [/Y]
 Help:     MKFATIMG.G4B [/?|--?|?]
 
 
@@ -57,6 +57,10 @@ Use COPYSYS.G4B: https://github.com/deomsh/COPYSYS.G4B
 Copy ram-disk afterwards to image file (see 'Use 4' above)
 
 History
+V0.5:
+Switch '/Y' to supress Make/ Overwrite dialogs (use with /Q: silent overwrite file too)
+BUGFIX: if ATTRIBFT.lll/ FATLFN.LLL is missing working again for 8.3 Short File names
+
 V0.4:
 Long File Names supported if Libraries are present
 Switch '/ROOTENTR:n' with predefined floppies too (switch '/F:floppysize')
