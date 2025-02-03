@@ -58,8 +58,8 @@ Copy ram-disk afterwards to image file (see 'Use 4' above)
 
 History
 V0.5:
-Switch '/Y' to supress Make/ Overwrite dialogs (use with /Q: silent overwrite file too)
-BUGFIX: if ATTRIBFT.lll/ FATLFN.LLL is missing working again for 8.3 Short File names
+Switch '/Y' to suppress Make/ Overwrite dialogs (use with /Q: silent overwrite file too)
+BUGFIX: if ATTRIBFT.lll/ FATLFN.LLL is missing, working again for 8.3 Short File names
 
 V0.4:
 Long File Names supported if Libraries are present
