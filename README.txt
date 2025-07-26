@@ -1,4 +1,4 @@
-MKFATIMG.G4B v0.5 (20250203), by deomsh
+MKFATIMG.G4B v0.6 (20250725), by deomsh
 Use 1:    MKFATIMG.G4B --size=n|--sectors=N|--CHS=C/H/S FILE switches
 Switches: [/HDD|/FDD] [/FAT12|/FAT16|/FAT32] [/V:VOLUMENAME] [/BOOT[:OS]]
           [/NOTACTIVE] [/LOG] [/CON] [/R] [/SPT:S] [/HEADS:H] [/ROOTENTR:n]
@@ -57,6 +57,9 @@ Use COPYSYS.G4B: https://github.com/deomsh/COPYSYS.G4B
 Copy ram-disk afterwards to image file (see 'Use 4' above)
 
 History
+V0.6:
+NEW: FAT (and FATLFN.LLL + ATTRIBFT.LLL if used) not unloaded afterwards if already loaded with insmod
+
 V0.5:
 Switch '/Y' to suppress Make/ Overwrite dialogs (use with /Q: silent overwrite file too)
 BUGFIX: if ATTRIBFT.lll/ FATLFN.LLL is missing, working again for 8.3 Short File names
