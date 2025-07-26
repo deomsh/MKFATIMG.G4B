@@ -1,5 +1,5 @@
 !BAT
-#-#+ MKFATIMG.G4B v0.5 (20250203), by deomsh
+#-#+ MKFATIMG.G4B v0.6 (20250725), by deomsh
 if "%~1"=="" && echo Use 1:    MKFATIMG.G4B --size=n|--sectors=N|--CHS=C/H/S FILE switches
 if "%~1"=="" && echo Switches: [/HDD|/FDD] [/FAT12|/FAT16|/FAT32] [/V:VOLUMENAME] [/BOOT[:OS]]
 if "%~1"=="" && echo $[]          [/NOTACTIVE] [/LOG] [/CON] [/R] [/SPT:S] [/HEADS:H] [/ROOTENTR:n]
@@ -12,10 +12,10 @@ if "%~1"=="" && echo Switches: [/SPT:S] [/HEADS:H] [/LOG] [/BOOT[:OS]] [/NOTACTI
 if "%~1"=="" && echo $[]          [/FAT12|/FAT16|/FAT32] [/V:VOLUMENAME] [/ROOTENTR:n] [/RSRV:n]
 if "%~1"=="" && echo $[]          [/RDBASE:n] [/Q|/T] [/Y]
 if "%~1"=="" && echo Use 4:    MKFATIMG.G4B FILE /COPY [/CON] [/Q|/T] [/Y]
-#TODO/CHECK: '/RD:n|FILE2' with '/COPY'#
+#TODO/CHECK#: '/RD:n|FILE2' with '/COPY'
 if "%~1"=="" && echo Help:     MKFATIMG.G4B /?|--?|? && goto :examples
-#-# '/BOOT:OS' not functional yet for '/BOOT:OS OS=ZERO'
-#-# OS: EFI = to check !#
+## '/BOOT:OS' not functional yet for '/BOOT:OS OS=ZERO'
+## OS: EFI = to check !
 if exist @uefi && graphicsmode > nul &; if %@retval%<=0xFF && echo Textmode of Grub4dos for UEFI not supported && goto :eof
 setlocal && set /a version=*0x8278&0xffffffff > nul &; if %version%>=20170830 && endlocal ! echo Grub4dos version %version% too old, use version 20170830 or later && endlocal && goto :eof
 setlocal && set * && set "RAMDISK=%RAMDISK%"
@@ -31,6 +31,7 @@ if not exist SIZE && if not exist SECTORS && if not exist CHS &; if /i "%~1"=="-
 if not exist SIZE && if not exist SECTORS && if not exist CHS &; if not /i "%~1"=="--CHS" if not /i "%~1"=="--C/H/S" |; set CHS=%~2 && shift && shift
 set "arg=%~1" &; set /a larg=%@retval%
 call Fn.11 "%~1" ")/" && set "PATH=%~p1"
+delmod -l fat > nul && set INSMOD=fat ! set INSMOD=INSMOD ;; delmod -l FATLFN.LLL > nul && set INSMOD=%INSMOD%;FATLFN.LLL ;; delmod -l ATTRIBFT.LLL > nul && set INSMOD=%INSMOD%;ATTRIBFT.LLL
 if exist PATH &; delmod -l fat > nul || insmod %rt%/fat > nul || insmod %srcDRIVE%/fat > nul || insmod %srcDRIVE%/grub/fat > nul || insmod %srcDRIVE%/boot/grub/fat > nul || insmod %srcDRIVE%/g4dll/fat > nul || insmod (bd)/boot/grub/fat > nul || insmod (bd)/fat > nul || insmod (bd)/boot/grub/fat > nul || insmod (bd)/grub/fat > nul || insmod (bd)/g4dll/fat > nul |; if not exist NULL && call :Fn.4 &; set v0=%v% && set v= && set h= &; echo Can not load grubutil 'fat', continue make (partial) image in ram-disk only?%NULL% &; set /p /u "continue= Continue? (Yes=Y, No=N) > " && echo ! echo && set continue=N &; if not %continue%==Y && set result=0 && goto :eov
 if exist PATH &; delmod -l ATTRIBFT.LLL > nul || insmod %rt%/ATTRIBFT.LLL > nul || insmod %srcDRIVE%/ATTRIBFT.LLL > nul || insmod /ATTRIBFT.LLL > nul || insmod (bd)/boot/grub/ATTRIBFT.LLL > nul || insmod (bd)/ATTRIBFT.LLL > nul || insmod (bd)/grub/ATTRIBFT.LLL > nul || insmod (bd)/g4dll/ATTRIBFT.LLL > nul || insmod %@root%/ATTRIBFT.LLL > nul || set ATTRIBFT=N
 if exist PATH && if not %ATTRIBFT%==N &; delmod -l FATLFN.LLL > nul || insmod %rt%/FATLFN.LLL > nul || insmod %srcDRIVE%/FATLFN.LLL > nul || insmod /FATLFN.LLL > nul || insmod (bd)/boot/grub/FATLFN.LLL > nul || insmod (bd)/FATLFN.LLL > nul || insmod (bd)/grub/FATLFN.LLL > nul || insmod (bd)/g4dll/FATLFN.LLL > nul || insmod %@root%/FATLFN.LLL > nul || set FATLFN=N
@@ -80,7 +81,6 @@ if not exist secpclus &; if /i "%arg:~0,5%"=="/SPC:" && set /A secpclus=%arg:~5%
 if not exist Y &; if /i "%arg%"=="/Y" && set Y=Y && shift && goto :argloop
 #MaybeLater#if not exist secpclus &; if /i "%arg:~0,5%"=="/SPC:" && set /A secpclus=%arg:~5% &; if %secpclus%==1 && shift && goto :argloop ! if %secpclus%==2 && shift && goto :argloop ! if %secpclus%<=128 && calc %secpclus% % 4 || shift && goto :argloop ! echo Switch '%arg%' is not valid && goto :eov
 :endofargloop
-#OKE_XXvars##echo -n > (md)0x302+60 && set > (md)0x302+60 && raw cat --locate=\x0A (md)0x302+60 > nul &; echo %0 NUMVARS=%@retval% && cat --locate=\x0A --replace=\x20 (md)0x302+60 && raw cat (md)0x302+60 && echo && echo -n && pause Press a Key to Continue... && echo
 if exist VOLLABEL && setlocal && call :SFN "FILE" "%VOLLABEL:~0,8%.%VOLLABEL:~8%" &; if %SFN%==N && endlocal && echo Volume label '%VOLLABEL%' is not valid && set result=0 && goto :eov ! endlocal
 if "%Q%"=="/Q" && set "NULL= > nul"
 if not "%~1"=="" &; if not "%Q%"=="/Q" && echo Abort: invalid switch$[0x00]"$[]'%~1'$[0x00]"$[] ! set "Q=%Q%" &; set result=0 && goto :eov
@@ -114,7 +114,6 @@ if /i %FLOPTYPE:~-5,5%==4096m && set /a FLOPTYPE=%FLOPTYPE%>>10-1 ! if /i %FLOPT
 if exist rootentr && if not %fattype%==FAT32 && set /a rootsect=%rootentr%/16 &; set /a rootsect=%rootsect% * 16
 if not exist rootsect && set /A rootsect=32
 if not exist rsrvsect &; if %fattype%==FAT32 && set /A rsrvsect=32 ! set /A rsrvsect=1
-#OKE_XXvars##echo -n > (md)0x302+60 && set > (md)0x302+60 && raw cat --locate=\x0A (md)0x302+60 > nul &; echo %0 NUMVARS=%@retval% && cat --locate=\x0A --replace=\x20 (md)0x302+60 && raw cat (md)0x302+60 && echo && echo -n && pause Press a Key to Continue... && echo
 call :validate &; if %result%==0 && goto :eov
 if %disk:~1,2%==hd && set floppy=
 if not exist FLOPTYPE && if not exist DISKTYPE && call :getHSdisk &; if %result%==0 && goto :eov
@@ -126,7 +125,6 @@ set SECTORS= && set SIZE=
 if not %DEVICE%==(rd) && set "FILE=%DEVICE%%%PATH%%%NAME%%%EXT%" && set DEVICE= && set PATH= && set NAME= && set EXT= && set choice= && set numplus= && set rename= ! set PATH= && set NAME= && set EXT= && set choice= && set numplus= && set rename=
 if not exist rdbase && set /A rdbase=256m ! set rdbase=%rdbase% &; call :makeramdisk "%DEVICE%" "%rdbase%" "%imgsize%" "%LOG%"
 #NotAlwaysStable#if not exist rdbase && set /A rdbase=64m ! set rdbase=%rdbase% &; call :makeramdisk "%DEVICE%" "%rdbase%" "%imgsize%" "%LOG%"
-#OKE_XXvars##echo -n > (md)0x302+60 && set > (md)0x302+60 && raw cat --locate=\x0A (md)0x302+60 > nul &; echo %0 NUMVARS=%@retval% && cat --locate=\x0A --replace=\x20 (md)0x302+60 && raw cat (md)0x302+60 && echo && echo -n && pause Press a Key to Continue... && echo
 if %result%==0 && goto :eov
 if %disk:~1,2%==hd && call :preparembr &; if %result%==0 && goto :eov
 if %disk:~1,2%==fd && set ptstart=0
@@ -142,7 +140,6 @@ if not exist bootcode && set oemname=IBM\x20\x202.0
 set bytepsec=x00\x02
 if %fattype%==FAT32 && set FLOPTYPE=
 if not exist FLOPTYPE && call :getsectorspercluster &; if %result%==0 && goto :eov
-#OKE_XXvars##echo && echo -n > (md)0x302+60 && set > (md)0x302+60 && raw cat --locate=\x0A (md)0x302+60 > nul &; echo %0 NUMVARS=%@retval% && cat --locate=\x0A --replace=\x20 (md)0x302+60 && raw cat (md)0x302+60 && echo && echo -n && pause Press a Key to Continue... && echo
 if not %floppy%==RM && goto :rsrvsect
 if exist FLOPTYPE && call :FLOPTYPEsecperclusmediabyt &; goto :rsrvsect
 if %heads%==2 &; if not %sectrack%==9 if not %sectrack%==15 || set mediabyt=xF9 && goto :rsrvsect
@@ -185,7 +182,6 @@ if exist drivenum || if %disk:~1,2%==fd && set drivenum=x00
 if %disk:~1,2%==hd && set drivenum=x80
 call :uuid &; if %result%==0 && goto :eov
 set magicbyt=x55\xAA
-#OKE_42vars##echo -n > (md)0x302+60 && set > (md)0x302+60 && raw cat --locate=\x0A (md)0x302+60 > nul &; echo %0 NUMVARS=%@retval% && cat --locate=\x0A --replace=\x20 (md)0x302+60 && raw cat (md)0x302+60 && echo && echo -n && pause Press a Key to Continue... && echo
 if "%V%"=="/V" &; if %disk:~1,2%==fd && echo Create %fattype% floppy on (rd) ! if "%LOG%"=="/LOG" && echo Create %fattype% logical partition on (rd) ! echo Create %fattype% primary partition on (rd) &; set check= &; set /p /u "check= Start writing PBR on (rd)%ptstart%+1? N=quit Y=yes > " && echo ! echo && set check=
 if "%V%"=="/V" &; if %check%==Y && set check= ! echo Aborted by user && set result=0 && goto :eov
 errorcheck off
@@ -235,7 +231,6 @@ if exist VOLLABEL &; raw write (rd)%startdir%+1 %VOLLABEL% > nul || echo Bad wri
 if exist VOLLABEL && if %fattype%==FAT32 &; raw write --offset=0x47 (rd)%ptstart%+1 %VOLLABEL% > nul || echo Bad write of Bootsector Volume Label%NULL% && set result=0 && goto :eov
 if exist VOLLABEL && if %fattype%==FAT32 &; raw write --offset=0xC47 (rd)%ptstart%+7 %VOLLABEL% > nul && set VOLLABEL= ! echo Bad write of Bootsector Volume Label%NULL% && set result=0 && goto :eov
 if exist VOLLABEL && if not %fattype%==FAT32 &; raw write --offset=0x2B (rd)%ptstart%+1 %VOLLABEL% > nul && set VOLLABEL= ! echo Bad write of Bootsector Volume Label%NULL% && set result=0 && goto :eov
-#OKE_48vars##echo -n > (md)0x302+60 && set > (md)0x302+60 && raw cat --locate=\x0A (md)0x302+60 > nul &; echo %0 NUMVARS=%@retval% && cat --locate=\x0A --replace=\x20 (md)0x302+60 && raw cat (md)0x302+60 && echo && echo -n && pause Press a Key to Continue... && echo
 if "%V%"=="/V" &; if %fattype%==FAT32 && echo Write backup FAT32 (normally to sectors 6-8)
 if %fattype%==FAT32 && raw dd if=(rd)%ptstart%+1 of=(rd)%ptstart%+7 skip=0 seek=6 > nul || echo Bad dd-copy of backup of first bootsector%NULL% && set result=0 && goto :eov
 if %fattype%==FAT32 && raw dd if=(rd)%ptstart%+2 of=(rd)%ptstart%+8 skip=1 seek=7 > nul || echo Bad dd-copy of backup of second bootsector%NULL% && set result=0 && goto :eov
@@ -246,9 +241,9 @@ call :read 0xE (rd)%ptstart%+1 &; set /a reserved=%result%&0xffff
 call :read 0x20 (rd)%ptstart%+1 &; set /A totsect=%result%&0xffffffff
 call :read 0x24 (rd)%ptstart%+1 &; set /A fatsz32=%result%&0xffffffff
 set /a clusters=%totsect%-%fatsz32%-%fatsz32%-%reserved%/%secpclus%
-#NOTGOOD: reserved 32 + 2x fatsz32 missing & (rd) not fully ... (?) now#
-#BAD set /A arg32=-%numfats:~2% * %sectpfat% / %secpclus% + %clusters%
-#Evt. 1 cluster minder, omdat de eerste cluster geteld wordt als cluster NUL???
+#NOTGOOD#: reserved 32 + 2x fatsz32 missing & (rd) not fully ... (?) now
+#BAD# set /A arg32=-%numfats:~2% * %sectpfat% / %secpclus% + %clusters%
+## 1 cluster less, because first cluster is counted too: NUL???
 set /A arg32=%clusters%
 set /a arg32=%clusters%-1
 set /A arg32=%arg32%
@@ -266,7 +261,6 @@ raw write --offset=0x3EC (rd)%ptstart%+2 \%nextfree% > nul && set nextfree= ! ec
 if not "%Q%"=="/Q" &; errorcheck off
 #BADfor(rd)??#
 set sectbal=
-#OKE_27vars##echo -n > (md)0x302+60 && set > (md)0x302+60 && raw cat --locate=\x0A (md)0x302+60 > nul &; echo %0 NUMVARS=%@retval% && cat --locate=\x0A --replace=\x20 (md)0x302+60 && raw cat (md)0x302+60 && echo && echo -n && pause Press a Key to Continue... && echo
 if not "%Q%"=="/Q" &; setlocal && set * && set disk=%disk% && set imgsize=%imgsize% && set "DISKTYPE=%DISKTYPE%" && set "CHS=%CHS%" && set cylinder=%cylinder% && set heads=%heads% && set /a sectrack=0%sectrack:~0,3% && set /a bytepsec=0%bytepsec:~-3,3%%%bytepsec:~1,2% &; if not exist cylinders && set /a cylinders=%imgsize%>>9/%heads%/%sectrack% ! set cylinders=%cylinders% &; set /a sectors=%imgsize%>>9 &; if exist DISKTYPE && echo Image size: %imgsize% bytes %DISKTYPE% ! if exist CHS && echo Image size: %imgsize% bytes %CHS% ! echo Image size: %imgsize% bytes (C/H/S=%cylinder%/%heads%/%sectrack%, Sector count/size=%sectors%/%bytepsec%) &; endlocal && set DISKTYPE= && set CHS=
 gsize% bytes (Volume sector count/size=%sectors%/%bytepsec%) ! echo Image size: %imgsize% bytes (C/H/S=%cylinder%/%heads%/%sectrack%, sector count/size=%sectors%/%bytepsec%) &; endlocal && set DISKTYPE= && set CHS=
 call :fatinfo &; if %result%==0 && goto :eov
@@ -290,14 +284,16 @@ set /A rdbase=*0x82D0 && set /A rdsize=*0x82D8&0xffffffff &; if %DEVICE%==(rd) &
 #LowMemOnly#set /A rdbase=*0x82D0&0xffffffff && set /A rdsize=*0x82D8&0xffffffff
 #MAYBE#echo crc32rd=%crc32rd%
 #MAYBE#set "RAMDISK=set imgsize=%imgsize% && set rdbase=%rdbase% && set rdsize=%rdsize% && set disk=%disk% && set LOG=%LOG% && set crc32rd=%crc32rd%"
-#OKE_38vars##echo -n > (md)0x302+60 && set > (md)0x302+60 && raw cat --locate=\x0A (md)0x302+60 > nul &; echo %0 NUMVARS=%@retval% && cat --locate=\x0A --replace=\x20 (md)0x302+60 && raw cat (md)0x302+60 && echo && echo -n && pause Press a Key to Continue... && echo
 set "RAMDISK=set imgsize=%imgsize% && set rdbase=%rdbase% && set rdsize=%rdsize% && set disk=%disk% && set LOG=%LOG% && set rdbase0=%rdbase0% && set rdsize0=%rdsize0%"
 if %result%==1 && if exist %FILE% && if exist rdbase0 && if exist rdsize0 &; map --rd-base=%rdbase0% && map --rd-size=%rdsize0%
 :eov
 if %result%==0 && if not exist FILE && if exist rdbase0 && if exist rdsize0 &; map --rd-base=%rdbase0% && map --rd-size=%rdsize0%
-delmod -l fat > nul && delmod fat > nul
-delmod -l fatlfn.lll > nul && delmod fatlfn.lll > nul
-delmod -l attribft.lll > nul && delmod attribft.lll > nul
+call Fn.11 "%INSMOD%" "fat" |; delmod -l fat > nul && delmod fat > nul
+call Fn.11 "%INSMOD%" "FATLFN.LLL" |; delmod -l fatlfn.lll > nul && delmod fatlfn.lll > nul
+call Fn.11 "%INSMOD%" "ATTRIBFT.LLL" |; delmod -l attribft.lll > nul && delmod attribft.lll > nul
+#ORG#delmod -l fat > nul && delmod fat > nul
+#ORG#delmod -l fatlfn.lll > nul && delmod fatlfn.lll > nul
+#ORG#delmod -l attribft.lll > nul && delmod attribft.lll > nul
 if %pagersts%==1 && pager on > nul ! pager off > nul
 debug %debugsts% > nul
 debug msg=3
@@ -364,36 +360,36 @@ if exist FLOPTYPE &; checkrange 4,8,12,14,16,24,28,32,64,128,160,180,320,360,400
 if exist FLOPTYPE && if %fattype%==FAT12 &; checkrange 234752 calc %FLOPTYPE% > nul &; if not "%Q%"=="/Q" && echo Argument '/F:%FLOPTYPE%' is not valid with argument '/%fattype%' ! set "Q=%Q%" &; set result=0 && goto :eof
 if exist FLOPTYPE && if %fattype%==FAT16 &; checkrange 4,8,12,14,16,24,28,32,64,128,160,180,320,360,400,640,720,800,820,1200,1440,1600,1680,1760,1840,1920 calc %FLOPTYPE% > nul &; if not "%Q%"=="/Q" && echo Argument '/F:%FLOPTYPE%' is not valid with argument '/%fattype%' ! set "Q=%Q%" &; set result=0 && goto :eof
 if exist FLOPTYPE && if %fattype%==FAT32 &; checkrange 4,8,12,14,16,24,28,32,64,128,160,180,320,360,400,640,720,800,820,1200,1440,1600,1680,1760,1840,1920,2400,2880,3120,3200,3520,3600,3825,3840,4320,4590,4800,5760,6000,7200,8100,8400,8640,9180,9600,10080,10800,11520,12240,12960,12000,13200,14400,15360,15840,17280,18432,20160,20385,23040,25920,28800,31680 calc %FLOPTYPE% > nul &; if not "%Q%"=="/Q" && echo Argument '/F:%FLOPTYPE%' is not valid with argument '/%fattype%' ! set "Q=%Q%" &; set result=0 && goto :eof
-#FAT12 absolute minimum: 1 + 2 * 1 + 5 = 8 sectors (ram-disk?) = 4k ; for now 160k
-#CHECKHDD# 320 + 63 + 1008 = 1391 CHS 2/16/63 = 2016 >= 1008k LOG:  320 + 1008 + 1008 = 2336 CHS 3/16/63 = 3024 >= 1512k
-#MinimumHDD# 320 + 17 + 272 = 609 CHS 3/16/17 =  816 >= 408k  LOG:  320 +  272 +  272 =  864 CHS 4/16/17 = 1088 >=  544k
+## FAT12: absolute minimum: 1 + 2 * 1 + 5 = 8 sectors (ram-disk?) = 4k ; for now 160k
+## CHECKHDD: 320 + 63 + 1008 = 1391 CHS 2/16/63 = 2016 >= 1008k LOG:  320 + 1008 + 1008 = 2336 CHS 3/16/63 = 3024 >= 1512k
+## MinimumHDD: 320 + 17 + 272 = 609 CHS 3/16/17 =  816 >= 408k  LOG:  320 +  272 +  272 =  864 CHS 4/16/17 = 1088 >=  544k
 #NotSoGood#if not exist FLOPTYPE && if %fattype%==FAT12 && if %disk:~1,2%==fd &; if not %size%>=4 &; if not "%Q%"=="/Q" && echo %SIZE% bytes is below 4KB for %fattype% on %disk:~1% ! set "Q=%Q%" &; set result=0 && goto :eof
 #NotSoGood#if not exist FLOPTYPE && if %fattype%==FAT12 && if %disk:~1,2%==fd &; if not %size%>=36 &; if not "%Q%"=="/Q" && echo %SIZE% bytes is below 36KB for %fattype% on %disk:~1%, use switch /ROOTENTR:n ! set "Q=%Q%" &; set result=0 && goto :eof
 if not exist FLOPTYPE && if %fattype%==FAT12 && if %disk:~1,2%==fd &; if not %size%>=160 &; if not "%Q%"=="/Q" && echo Size %SIZE% bytes / %size%KB is below 160KB for %fattype% on %disk:~1%: use an available option of switch /F:floppysize ! set "Q=%Q%" &; set result=0 && goto :eof
 if %fattype%==FAT12 && if %disk:~1,2%==hd && if %sectrack%==17 &; if not "%LOG%"=="/LOG" && if not %size%>=408 && set result=0 && set low=408KB ! if "%LOG%"=="/LOG" && if not %size%>=544 && set result=0 && set low=544KB ! set result= &; if %result%==0 &; if not "%Q%"=="/Q" && echo %SIZE% is below %low% for %fattype% on %disk:~1% ! if "%LOG%"=="/LOG" && set "Q=%Q%" ! set result= &; set result=0 && goto :eof
 if %fattype%==FAT12 && if %disk:~1,2%==hd && if not %sectrack%==17 &; if not "%LOG%"=="/LOG" && if not %size%>=1008 && set result=0 && set low=1008KB ! if "%LOG%"=="/LOG" && if not %size%>=1512 && set result=0 && set low=1512KB ! set result= &; if %result%==0 &; if not "%Q%"=="/Q" && echo %SIZE% is below %low% for %fattype% on %disk:~1% ! if "%LOG%"=="/LOG" && set "Q=%Q%" ! set result= &; set result=0 && goto :eof
-#FAT12: maximum 4084; SAFER (Jaclaz) = 4078 clusters * 64 + 2 * 12 FAT + 1 reserved + 32 root = 261,049 = 130525k = 127.47m (with 4084: 261433 sectors = 130716.5k = 127.6528m)
+## FAT12: maximum 4084; SAFER (Jaclaz) = 4078 clusters * 64 + 2 * 12 FAT + 1 reserved + 32 root = 261,049 = 130525k = 127.47m (with 4084: 261433 sectors = 130716.5k = 127.6528m)
 if not exist FLOPTYPE && if %fattype%==FAT12 &; if %disk:~1,2%==fd && if %size%>=130526 && set result=0 && set low=130526KB ! if %disk:~1,2%==hd && if not "%LOG%"=="/LOG" && if %size%>=130815 && set result=0 && set low=130815KB ! if %disk:~1,2%==hd && if "%LOG%"=="/LOG" && if %size%>=131070 && set result=0 && set low=131070KB ! set result= &; if %result%==0 &; if not "%Q%"=="/Q" && echo Size %SIZE% bytes/ %size% KB is not below %low% for %fattype% && goto :eof ! goto :eof
 #REVIEWAGAIN???#
-#FAT16: minimum 4085 + 2 * 16 FAT + 1 reserved + 32 root = 4150 = 2075k !! only minimum 2079KB is working with formule
-#CHECK#FDD: 4150 => CHS 260*2*8 = 4160 AND CHS 44*2*48 = 4224 AND CHS 33*2*63 = 4158 SO >= 2070k IN PRACTICE for SPT 8-63 >=2370k needed
-#CHECK1#HDD: 4150 + 63 + 1008 = 5191 sectors => CHS minimum (inluding one test-cylinder) 6/16/63 = 6048 sectors = 3024k AND for /LOG + 1008 = 7/16/63 = 7056 sectors = 3528k
-#MINIMUM#HDD: 4150 + 17 + 272 = 4439 sectors => CHS minimum (inluding one test-cylinder) 17/16/17 = 4624 sectors = 2312k AND for /LOG + 272 = 18/16/17 = 4896 sectors = 2448k
+## FAT16: minimum 4085 + 2 * 16 FAT + 1 reserved + 32 root = 4150 = 2075k !! only minimum 2079KB is working with formule
+#CHECK# FDD: 4150 => CHS 260*2*8 = 4160 AND CHS 44*2*48 = 4224 AND CHS 33*2*63 = 4158 SO >= 2070k IN PRACTICE for SPT 8-63 >=2370k needed
+#CHECK1# HDD: 4150 + 63 + 1008 = 5191 sectors => CHS minimum (inluding one test-cylinder) 6/16/63 = 6048 sectors = 3024k AND for /LOG + 1008 = 7/16/63 = 7056 sectors = 3528k
+#MINIMUM# HDD: 4150 + 17 + 272 = 4439 sectors => CHS minimum (inluding one test-cylinder) 17/16/17 = 4624 sectors = 2312k AND for /LOG + 272 = 18/16/17 = 4896 sectors = 2448k
 if %fattype%==FAT16 && if %sectrack%==17 &; if %disk:~1,2%==fd && if not %size%>=2370 && set result=0 && set low=2370KB ! if %disk:~1,2%==hd && if not "%LOG%"=="/LOG" && if not %size%>=2312 && set result=0 && set low=2312KB ! if %disk:~1,2%==hd && if "%LOG%"=="/LOG" && if not %size%>=2448 && set result=0 && set low=2848KB ! set result= &; if %result%==0 &; if not "%Q%"=="/Q" && echo Size %SIZE% bytes/ %size% KB is below %low% for %fattype% on %disk:~1% %LOG% && goto :eof ! goto :eof
 if %fattype%==FAT16 && if not %sectrack%==17 &; if %disk:~1,2%==fd && if not %size%>=2079 && set result=0 && set low=2079KB ! if %disk:~1,2%==hd && if not "%LOG%"=="/LOG" && if not %size%>=3024 && set result=0 && set low=3024KB ! if %disk:~1,2%==hd && if "%LOG%"=="/LOG" && if not %size%>=3528 && set result=0 && set low=3528KB ! set result= &; if %result%==0 &; if not "%Q%"=="/Q" && echo Size %SIZE% bytes/ %size% KB is below %low% for %fattype% on %disk:~1% %LOG% && goto :eof ! goto :eof
 #BAD#if %fattype%==FAT16 && if not %sectrack%==17 &; if %disk:~1,2%==fd && if not %size%>=2075 && set result=0 && set low=2075KB ! if %disk:~1,2%==hd && if not "%LOG%"=="/LOG" && if not %size%>=3024 && set result=0 && set low=3024KB ! if %disk:~1,2%==hd && if "%LOG%"=="/LOG" && if not %size%>=3528 && set result=0 && set low=3528KB ! set result= &; if %result%==0 &; if not "%Q%"=="/Q" && echo Size %SIZE% bytes/ %size% KB is below %low% for %fattype% on %disk:~1% %LOG% && goto :eof ! goto :eof
-#FAT16: maximum 65624 clusters * 64 + 2 * 257 FAT + 1 reserved + 32 root = 4,200,451 = 2,100,226k but 2g=2,097,152k!!
+## FAT16: maximum 65624 clusters * 64 + 2 * 257 FAT + 1 reserved + 32 root = 4,200,451 = 2,100,226k but 2g=2,097,152k!!
 if %fattype%==FAT16 && if %size%>=2097152 &; if not "%Q%"=="/Q" && echo %SIZE% is not below 2097152KB for %fattype% ! set "Q=%Q%" &; set result=0 && goto :eof
 #TooLow!#if %fattype%==FAT16 && if %size%>=2096769 && echo %SIZE% is too high for %fattype% && set result=0 && goto :eof
-#FAT32: minimum 65525 clusters + (2x FAT 65525 * 4 = 1024) + 32 reserved = 66581 sectors IN PRACTICE 66640 ???
-#CHECK#FDD: 66640 => CHS 695*2*48 = 66720 AND CHS 926*2*36 = 66672 AND CHS *255*63 = 66672 SO >=33336k and with CHS
-#BADfor fat_info#FDD: 66624 = CHS 694*2*48 AND 66600 = CHS 925*2*36 SO >=33300k
-#CHECK#HDD: 66640 + 63 + 1008 = 67711 sectors => CHS minimum (inluding one test-cylinder) 68/16/63 = 68544 sectors = 34272k AND for /LOG + 1008 = 69/16/63 = 69552 sectors = 34776k
-#MINIMUM#HDD: 66640 + 17 + 272 = 66929 sectors => CHS minimum (inluding one test-cylinder) 247/16/17 = 67184 sectors = 33592k AND for /LOG + 272 = 248/16/17 = 67456 sectors = 33728k
+## FAT32: minimum 65525 clusters + (2x FAT 65525 * 4 = 1024) + 32 reserved = 66581 sectors IN PRACTICE 66640 ???
+#CHECK# FDD: 66640 => CHS 695*2*48 = 66720 AND CHS 926*2*36 = 66672 AND CHS *255*63 = 66672 SO >=33336k and with CHS
+#BADfor fat_info# FDD: 66624 = CHS 694*2*48 AND 66600 = CHS 925*2*36 SO >=33300k
+#CHECK# HDD: 66640 + 63 + 1008 = 67711 sectors => CHS minimum (inluding one test-cylinder) 68/16/63 = 68544 sectors = 34272k AND for /LOG + 1008 = 69/16/63 = 69552 sectors = 34776k
+#MINIMUM# HDD: 66640 + 17 + 272 = 66929 sectors => CHS minimum (inluding one test-cylinder) 247/16/17 = 67184 sectors = 33592k AND for /LOG + 272 = 248/16/17 = 67456 sectors = 33728k
 if %fattype%==FAT32 && if %disk:~1,2%==fd && if not %size%>=33336 && set result=0 &; if not "%Q%"=="/Q" && echo Size %SIZE% bytes/ %size% KB is below 33336KB for %fattype% on %disk:~1% && goto :eof ! goto :eof
 if %fattype%==FAT32 && if %sectrack%==17 &; if %disk:~1,2%==hd && if not "%LOG%"=="/LOG" && if not %size%>=33592 && set result=0 && set low=33592KB ! if %disk:~1,2%==hd && if "%LOG%"=="/LOG" && if not %size%>=33728 && set result=0 && set low=33728KB ! set result= &; if %result%==0 &; if not "%Q%"=="/Q" && echo Size %SIZE% bytes/ %size% KB is blow %low% for %fattype% on %disk:~1% && goto :eof ! goto :eof
 if %fattype%==FAT32 && if not %sectrack%==17 &; if %disk:~1,2%==hd && if not "%LOG%"=="/LOG" && if not %size%>=34272 && set result=0 && set low=34272KB ! if %disk:~1,2%==hd && if "%LOG%"=="/LOG" && if not %size%>=34776 && set result=0 && set low=34776KB ! set result= &; if %result%==0 &; if not "%Q%"=="/Q" && echo Size %SIZE% bytes/ %size% KB is below %low% for %fattype% on %disk:~1% && goto :eof ! goto :eof
-#-# CHECK if without memory is possible, because of new FAT-version without bug and if with WRITEMBR
+## CHECK if without memory is possible, because of new FAT-version without bug and if with WRITEMBR
 #=NEGATIVE#echo "if exist bootcode && if not %bootcode%==DEF &; if not %bootcode%==FREEDOS if not %bootcode%==NT5 if not %bootcode%==GRUB if not %bootcode%==VISTA if not %bootcode%==WIN7 if not %bootcode%==EFI |; if not "%Q%"=="/Q" && echo Bootcode %bootcode% is not valid ! set "Q=%Q%" &; set result=0 && goto :eof
 if exist bootcode && if not %bootcode%==DEF &; if not %bootcode%==ZERO |; if not "%Q%"=="/Q" && echo Bootcode %bootcode% is not valid ! set "Q=%Q%" &; set result=0 && goto :eof
 if exist bootcode && if not %bootcode%==DEF &; if %bootcode%==FDOS && set bootcode=FREEDOS ! if %bootcode%==NT && set bootcode=NT5 ! if %bootcode%==ROS && set bootcode=REACTOS ! set bootcode=%bootcode% &; if not %bootcode%==MSDOS33 && if not %bootcode%==MSDOS40 && if not %bootcode%==MSDOS50 && if not %bootcode%==MSDOS71 && if not %bootcode%==GRUB && if not %bootcode%==FREEDOS && if not %bootcode%==NT5 && if not %bootcode%==VISTA && if not %bootcode%==WIN7 && if not %bootcode%==WIN8 && if not %bootcode%==WIN10 && if not %bootcode%==REACTOS &; if not "%Q%"=="/Q" && echo Bootcode %bootcode% is not valid ! set "Q=%Q%" &; set result=0 && goto :eof
@@ -404,10 +400,10 @@ if exist rdbase && if not %rdbase%>=64m &; if not "%Q%"=="/Q" && echo Value of R
 #NoTopMem!#setlocal && set /A lowmem=*0x8298&0xffffffff * 1k - 63m && set /A highmem=*0x82C0 * 1k &; set /a lowMB=%lowmem%>>20 && set /a highMB=%highmem%>>20 &; pause lowMB=%lowMB% highMB=%highMB% && if %DEVICE%==(rd) && if %highMB%==0 && if not %SIZE%<=%lowmem% && echo Abort: needed size of (rd) above available %lowMB%MB contiguous memory && set result=0 ! if %DEVICE%==(rd) && if not %highMB%==0 && if not %SIZE%<=%lowmem% && if not %SIZE%<=%highmem% && echo Abort: needed size of (rd) above two available %lowMB%MB + %highMB%MB contiguous memory-regions && set result=0 ! if "%LOG%"=="/LOG" && if not %lowmem%>=24m && if not %highmem%>=24m && echo Abort: size of available contiguous memory below 24MB && set result=0 ! if not %lowmem%>=16m && if not %highmem%>=16m && echo Abort: size of available contiguous memory below 16MB && set result=0 ! set result= &; if %result%==0 && endlocal && set result=0 && goto :eof ! endlocal
 #BADforGRUB4EFI#
 if not exist @uefi && if exist rdbase && setlocal &; if not %rdbase%>=4g && set /A lowmem=*0x8298&0xffffffff * 1k - %rdbase% ! set /A lowmem=*0x8298&0xffffffff * 1k &; set /A highmem=*0x82C0 * 1k &; set /a lowMB=%lowmem%>>20 && set /a highMB=%highmem%>>20 && set /a sizeMB=%SIZE%>>20 &; if not %lowmem%>=63m && set "msg=No available memory" ! if %DEVICE%==(rd) && if not %rdbase%>=4g && if not %SIZE%<=%lowmem% && set "msg=%sizeMB%MB needed size of (rd) above available %lowMB%MB contiguous memory" ! if %DEVICE%==(rd) && if %rdbase%>=4g && if not %SIZE%<=%highmem% && set "msg=%sizeMB%MB needed size of (rd) above available %highMB%MB contiguous high memory>=4GB" ! if "%LOG%"=="/LOG" && if not %rdbase%>=4g && if not %lowmem%>=24m && set "msg=Size of available contiguous memory below 24MB" ! if "%LOG%"=="/LOG" && if %rdbase%>=4g && if not %highmem%>=24m && set "msg=Size of available contiguous memory>=4GB below 24MB" ! if not %rdbase%>=4g && if not %lowmem%>=16m && set "msg=Size of available contiguous memory below 16MB" ! if %rdbase%>=4g && if not %highmem%>=16m && set "msg=Size of available contiguous memory>=4GB below 16MB" ! set msg= &; if not exist msg && endlocal ! if "%Q%"=="/Q" && endlocal && set result=0 && goto :eof ! echo %msg% && endlocal && set result=0 && goto :eof
-#LowMemOnlyif exist rdbase && setlocal && set /A lowmem=*0x8298&0xffffffff * 1k - %rdbase% &; set /a lowMB=%lowmem%>>20 && set /a sizeMB=%SIZE%>>20 &; if not %lowmem%>=1m && echo No available memory && set result=0 ! if %DEVICE%==(rd) && if not %SIZE%<=%lowmem% && echo Abort: %sizeMB%MB needed size of (rd) above available %lowMB%MB contiguous memory && set result=0 ! if "%LOG%"=="/LOG" && if not %lowmem%>=24m && echo Abort: size of available contiguous memory below 24MB && set result=0 ! if not %lowmem%>=16m && echo Abort: size of available contiguous memory below 16MB && set result=0 ! set result= &; if %result%==0 && endlocal && set result=0 && goto :eof ! endlocal
+#LowMemOnly#if exist rdbase && setlocal && set /A lowmem=*0x8298&0xffffffff * 1k - %rdbase% &; set /a lowMB=%lowmem%>>20 && set /a sizeMB=%SIZE%>>20 &; if not %lowmem%>=1m && echo No available memory && set result=0 ! if %DEVICE%==(rd) && if not %SIZE%<=%lowmem% && echo Abort: %sizeMB%MB needed size of (rd) above available %lowMB%MB contiguous memory && set result=0 ! if "%LOG%"=="/LOG" && if not %lowmem%>=24m && echo Abort: size of available contiguous memory below 24MB && set result=0 ! if not %lowmem%>=16m && echo Abort: size of available contiguous memory below 16MB && set result=0 ! set result= &; if %result%==0 && endlocal && set result=0 && goto :eof ! endlocal
 #BADforGRUB4EFI#
 if not exist @uefi && if not exist rdbase &; setlocal && set /A lowmem=*0x8298&0xffffffff * 1k - 63m && set /A highmem=*0x82C0 * 1k &; set /a highMB=%highmem%>>20 && set /a lowMB=%lowmem%>>20 &; if not %lowmem%>=63m && set "msg=No available memory" ! if %DEVICE%==(rd) && if not %SIZE%<=%lowmem% && if not %SIZE%<=%highmem% && set "msg=Needed size of (rd) above available %lowMB%MB + %highMB%MB contiguous low and high memory regions" ! if "%LOG%"=="/LOG" && if not %lowmem%>=24m && if not %highmem%>=24m && set "msg=Size of available contiguous memory below 24MB" ! if not %lowmem%>=16m && if not %highmem%>=16m && set "msg=Size of available contiguous memory below 16MB" ! set msg= &; if not exist msg && endlocal ! if "%Q%"=="/Q" && endlocal && set result=0 && goto :eof ! echo %msg% && endlocal && set result=0 && goto :eof
-#LowMemOnlyif not exist rdbase && setlocal && set /A lowmem=*0x8298&0xffffffff * 1k - 63m &; set /a lowMB=%lowmem%>>20 &; if %DEVICE%==(rd) && if not %SIZE%<=%lowmem% && echo Abort: needed size of (rd) above available %lowMB%MB contiguous memory && set result=0 ! if "%LOG%"=="/LOG" && if not %lowmem%>=24m && echo Abort: size of available contiguous memory below 24MB && set result=0 ! if not %lowmem%>=16m && echo Abort: size of available contiguous memory below 16MB && set result=0 ! set result= &; if %result%==0 && endlocal && set result=0 && goto :eof ! endlocal
+#LowMemOnly#if not exist rdbase && setlocal && set /A lowmem=*0x8298&0xffffffff * 1k - 63m &; set /a lowMB=%lowmem%>>20 &; if %DEVICE%==(rd) && if not %SIZE%<=%lowmem% && echo Abort: needed size of (rd) above available %lowMB%MB contiguous memory && set result=0 ! if "%LOG%"=="/LOG" && if not %lowmem%>=24m && echo Abort: size of available contiguous memory below 24MB && set result=0 ! if not %lowmem%>=16m && echo Abort: size of available contiguous memory below 16MB && set result=0 ! set result= &; if %result%==0 && endlocal && set result=0 && goto :eof ! endlocal
 if exist heads &; if not %heads%<=0 if not %heads%>=256 |; if not "%Q%"=="/Q" && echo Value '%heads%' of Heads out of range ! set "Q=%Q%" &; set result=0 && goto :eof
 if exist sectrack && if %disk:~1,2%==fd &; if not %sectrack%<=7 if not %sectrack%>=64 |; if not "%Q%"=="/Q" && echo Value '%sectrack%' of Sectors Per Track out of range for %disk:~1% ! set "Q=%Q%" &; set result=0 && goto :eof
 if exist sectrack && if %disk:~1,2%==hd &; if not %sectrack%<=16 if not %sectrack%>=64 |; if not "%Q%"=="/Q" && echo Value '%sectrack%' of Sectors Per Track out of range for %disk:~1% ! set "Q=%Q%" &; set result=0 && goto :eof
@@ -442,7 +438,7 @@ if %FLOPTYPE%==128 && set heads=1 && set sectrack=8
 if %FLOPTYPE%==234752 && set heads=32 && set sectrack=56
 if %FLOPTYPE%==123264 && set heads=8 && set sectrack=32
 if %FLOPTYPE%==20385 && set heads=2 && set sectrack=27
-#MaxforElTorito#
+## MaxforElTorito
 if %FLOPTYPE%==36864 && set heads=2 && set sectrack=36
 if %FLOPTYPE%==18432 && set heads=2 && set sectrack=18
 if %FLOPTYPE%==15360 && set heads=2 && set sectrack=15
@@ -488,14 +484,14 @@ if %FLOPTYPE%==3840 && set heads=2 && set sectrack=48
 if %FLOPTYPE%==3825 && set heads=2 && set sectrack=15
 #NotGoodForElToritoInVbox#
 if %FLOPTYPE%==3600 && set heads=2 && set sectrack=15
-#####
+#-------------------#
 if %FLOPTYPE%==3520 && set heads=2 && set sectrack=44
 if %FLOPTYPE%==3200 && set heads=2 && set sectrack=40
 if %FLOPTYPE%==3120 && set heads=2 && set sectrack=39
 if %FLOPTYPE%==2880 && set heads=2 && set sectrack=36
 #NotGoodForElToritoInVbox#
 if %FLOPTYPE%==2400 && set heads=2 && set sectrack=15
-#####
+#-------------------#
 if %FLOPTYPE%==1920 && set heads=2 && set sectrack=24
 if %FLOPTYPE%==1840 && set heads=2 && set sectrack=23
 if %FLOPTYPE%==1760 && set heads=2 && set sectrack=22
@@ -571,7 +567,7 @@ goto :eof
 setlocal
 set /a sectmax=%size% * 2
 set /a secthead=%sectmax%/%heads%
-#CHECK#Prime number: 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61,
+#CHECK# Prime numbers: 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61
 if %disk:~1,2%==hd && if not exist sectrack &; calc %secthead% % 17 > nul || set sectrack=17 ! calc %secthead% % 19 > nul || set sectrack=19 ! calc %secthead% % 23 > nul || set sectrack=23 ! calc %secthead% % 29 > nul || set sectrack=29 ! calc %secthead% % 31 > nul || set sectrack=31 ! calc %secthead% % 37 > nul || set sectrack=37 ! calc %secthead% % 41 > nul || set sectrack=41 ! calc %secthead% % 41 > nul || set sectrack=43 ! calc %secthead% % 47 > nul || set sectrack=47 ! calc %secthead% % 53 > nul || set sectrack=53 ! calc %secthead% % 59 > nul || set sectrack=59 ! calc %secthead% % 61 > nul || set sectrack=61 ! set sectrack=63
 if %disk:~1,2%==fd && if not exist sectrack && if %size%<=2880 &; if %sectmax%<=400 && set cylinder=40 && set /a maxSPT=%sectmax%/%heads%/40 ! if %sectmax%<=2880 && set cylinder=80 && set /a maxSPT=%sectmax%/%heads%/80
 if %disk:~1,2%==fd && if not exist sectrack &; set sectbase=8
@@ -606,11 +602,9 @@ if %DEVICE%==(rd) && set rdsize=%imgsize%
 if exist rdbase && set base=%rdbase% ! set /A base=256m
 #NotAlwysStable#if exist rdbase && set base=%rdbase% ! set /A base=64m
 #TEST#set /A result=115m
-#BADcallFn.24grub4dos:20230610>114m;
-#GOODcallFn.24grub4dos:2022150922;
-#OKE_XXvars##echo -n > (md)0x302+60 && set > (md)0x302+60 && raw cat --locate=\x0A (md)0x302+60 > nul &; echo %0 NUMVARS=%@retval% && cat --locate=\x0A --replace=\x20 (md)0x302+60 && raw cat (md)0x302+60 && echo && echo -n && pause Press a Key to Continue... && echo
+#BAD#callFn.24grub4dos:20230610>114m;
+#GOOD3callFn.24grub4dos:2022150922;
 call :findfreememory %rdsize% %base% %V% %Q% &; if %result%==0 &; if not "%Q%"=="/Q" && echo Can not find free memory starting at %rdbase% && endlocal && set result=0 && goto :eof ! endlocal && set result=0 && goto :eof
-#OKE_8vars##echo After :findfreememory && echo -n > (md)0x302+60 && set > (md)0x302+60 && raw cat --locate=\x0A (md)0x302+60 > nul &; echo %0 NUMVARS=%@retval% && cat --locate=\x0A --replace=\x20 (md)0x302+60 && raw cat (md)0x302+60 && echo && echo -n && pause Press a Key to Continue... && echo
 if exist rdbase &; if %rdbase%>=64m && set rdbase=%result% && set result= && set base= ! echo No usable memory for /RDBASE:%rdbase% && endlocal && set result=0 && goto :eof
 if not exist rdbase &; set rdbase=%result% && set result= && set base=
 map --rd-base=%rdbase% > nul
@@ -664,15 +658,13 @@ if exist leftsize &; if %SIZE%<=%leftsize% && set result=%rdend% ! set ask=Y
 if not exist NULL && if %ask%==Y &; call :Fn.4 &; set h= && set v0=%v% && set v= &; echo Not enough free memory: ram-disk at %MBrdbase%MB, size %MBrdsize%MB (%rdbase%-%rdend%) &; call :Fn.4 &; set h= && set v1=%v% && set v= &; set /p /u "overwrit= Overwrite ram-disk? (No=N, Yes=Y) > " && echo ! set overwrit=N &; if not %overwrit%==Y && echo Aborted by user && endlocal && set result=0 && goto :eof
 if %overwrit%==Y && call :Fn.4 &; set h= &; if %v0%==%v% && if %v%>=2 && set /a v0=%v%-2 ! if %v1%==%v% && if %v%>=2 && set /a v1=%v1%-1 && set /a v0=%v%-2 ! set v0=%v0% &; call :Fn.5 0 %v0% &; echo -e $[]                                                                              \x20 && echo -e -n $[]                                                                              \x20 && call :Fn.5 0 %v0% && set v0= && set v1= && set v=
 #MaybeNotSoGood#if "%Q%"=="/Q" && if %ask%==Y &; endlocal && set result=0 && goto :eof
-#OKE#echo %0 result=%result%
 if "%V%"=="/V" && if not %result%==0 &; setlocal && set /a MBbase=%result%>>20 && set /a KBbase=%result%>>10 && set /A sectbase=%result%>>9 && set /A leftsize=%memend%-%result%-512 && set /a MBsize=%memend%-%result%>>20 && set /a KBsize=%memend%-%result%>>10 && set /A sectsize=%memend%-%result%>>9 &; echo Lowest base: %result% bytes/ %KBbase%KB/ %MBbase%MB/ %sectbase% sectors && echo Free memory: %leftsize% bytes/ %KBsize%KB/ %MBsize%MB/ %sectsize% sectors && endlocal
 if not %rdbase%<=0xFFFFF if not %rdbase%==0x7FFFFFFF if not %overwrit%==Y || set rdbase= && set rdsize=
-#OKE_21vars##echo -n > (md)0x302+60 && set > (md)0x302+60 && raw cat --locate=\x0A (md)0x302+60 > nul &; echo %0 NUMVARS=%@retval% && cat --locate=\x0A --replace=\x20 (md)0x302+60 && raw cat (md)0x302+60 && echo && echo -n && pause Press a Key to Continue... && echo
 endlocal && set result=%result% && set rdbase0=%rdbase% && set rdsize0=%rdsize%
 goto :eof
 ::
 :availablememory
-#BADforGRUB4EFI:Base:,Length:,End:-IsUsing'='for':'#
+## BADforGRUB4EFI:Base:,Length:,End:-IsUsing'='for':'
 if exist @uefi &; raw cat --skip=%skip% --locate=Base= --number=1 (md)0x300+4 > nul |; if not "%Q%"=="/Q" && echo No usable memory available && set result=0 && goto :eof ! set result=0 && goto :eof
 if exist @uefi &; raw cat --skip=%skip% --locate=Base= --number=1 (md)0x300+4 > nul &; set /a skip=%?%+5 &; raw cat --skip=%skip% --locate=, --number=1 (md)0x300+4 > nul &; set /a length=%?%-%skip% &; raw cat --skip=%skip% --length=%length% (md)0x300+4 | set basesect= &; set /A basesect=0x%basesect%
 if not exist @uefi &; raw cat --skip=%skip% --locate=Base: --number=1 (md)0x300+4 > nul |; if not "%Q%"=="/Q" && echo No usable memory available && set result=0 && goto :eof ! set result=0 && goto :eof
@@ -703,7 +695,7 @@ if %result%==0 && set skipstat=0 && goto :availablememory
 goto :eof
 ::
 :getbasememory
-#g4e:different#
+#-#+ g4e:different
 raw cat --skip=%skipstat% --locate=\x0A --number=1 (md)0x300+4 > nul &; set /a skipstat=%?%+1 && set /a linestat=%linestat%+1
 if exist @uefi &; raw cat --skip=%skipstat% --locate=FF\x20 --length=3 (md)0x300+4 > nul &; set FFFr=Y && set /a skipstat=%?%+18
 if not exist @uefi &; raw cat --skip=%skipstat% --locate=FF\x20 --length=3 (md)0x300+4 > nul &; set FFFr=Y && set /a skipstat=%?%+24
@@ -761,12 +753,12 @@ if %fattype%==FAT16 && if %ptlength%>=16408 && set secpclus=x04 && goto :eof
 if %fattype%==FAT16 && if %ptlength%>=8240 && set secpclus=x02 && goto :eof
 if %fattype%==FAT16 && if %ptlength%>=4158 && set secpclus=x01 && goto :eof
 if %fattype%==FAT16 && if %ptlength%<=8202 && set secpclus=x01
-#Can be a probleem, x08 with ptlength=130977 = solved by removing "" for numbers#
+## Can be a probleem, x08 with ptlength=130977 = solved by removing "" for numbers
 #BAD#if %fattype%==FAT32 && if not %ptlength%>=66528 && echo Abort: Total sectors %ptlength% is BELOW 66528, unsupported on FAT32 && set result=0 && goto :eof
 #BAD#if %fattype%==FAT32 && if %ptlength%>=66528 && set secpclus=x01
 if %fattype%==FAT32 && if not %ptlength%>=66640 &; if not "%Q%"=="/Q" && echo Abort: Total disk sectors %ptlength% is BELOW 66640 unsupported on FAT32 && set result=0 && goto :eof ! set result=0 && goto :eof
 #>=256MB#
-#XP-Professional_Defaults#
+## XP-Professional_Defaults
 if %fattype%==FAT32 && if %ptlength%>=526336 && set secpclus=x08 && goto :eof
 if %fattype%==FAT32 && if %ptlength%>=264192 && set secpclus=x04 && goto :eof
 if %fattype%==FAT32 && if %ptlength%>=133120 && set secpclus=x02 && goto :eof
@@ -782,12 +774,11 @@ set /a secclus=0%secpclus%
 if %fattype%==FAT32 && set /a tmpval1=%ptlength% - %rootsect% ! set /a tmpval1=%ptlength% - %rootsect% - %rsrvsect%
 set /a tmpval2=256 * %secclus% + 2
 if %fattype%==FAT32 && set /a tmpval2=%tmpval2% / 2
-#maybe#set /a sectpfat=%tmpval1% + %tmpval2% / %tmpval2%
+#MATBE#set /a sectpfat=%tmpval1% + %tmpval2% / %tmpval2%
 if not %fattype%==FAT12 && set /a sectpfat=%tmpval1% + %tmpval2% - 1 / %tmpval2%
 if %fattype%==FAT12 && set /a tmpval2=%tmpval1%/%secclus% &; if %tmpval2%<=342 && set sectpfat=1 ! if %tmpval2%<=685 && set sectpfat=2 ! if %tmpval2%<=1028 && set sectpfat=3 ! if %tmpval2%<=1372 && set sectpfat=4 ! if %tmpval2%<=1715 && set sectpfat=5 ! if %tmpval2%<=2058 && set sectpfat=6 ! if %tmpval2%<=2402 && set sectpfat=7 ! if %tmpval2%<=2745 && set sectpfat=8 ! if %tmpval2%<=3088 && set sectpfat=9 ! if %tmpval2%<=3432 && set sectpfat=10 ! if %tmpval2%<=3775 && set sectpfat=11 ! set sectpfat=12
 #NONEEDANYMORE#if %fattype%==FAT12 && if not %sectpfat%<=12 && set sectpfat=12
 endlocal && set sectpfat=%sectpfat%
-#OLD#echo Generate fatsz16/fatsz32 Big-Endian
 set /A arg32=%sectpfat% &; call :arg32BE
 if %fattype%==FAT32 && set fatsz16=x00\x00 && set fatsz32=%arg32%
 if %fattype%==FAT16 && set fatsz16=%arg32:~0,7%
@@ -796,7 +787,7 @@ endlocal && set fatsz16=%fatsz16% && set fatsz32=%fatsz32%
 goto :eof
 ::
 :FLOPTYPEsecperclusmediabyt
-#Multiples of 1200 used as ElTorito Floppy can give problems in VBOX!#
+#-# Multiples of 1200 used as ElTorito Floppy can give problems in VBOX!
 if %FLOPTYPE%==4 &; if %fattype%==FAT12 && set secpclus=x01 && set mediabyt=xFF
 if %FLOPTYPE%==8 &; if %fattype%==FAT12 && set secpclus=x01 && set mediabyt=xFF
 if %FLOPTYPE%==12 &; if %fattype%==FAT12 && set secpclus=x01 && set mediabyt=xFF
@@ -858,9 +849,8 @@ if %FLOPTYPE%==3200 &; if %fattype%==FAT12 && set secpclus=x02 && set mediabyt=x
 if %FLOPTYPE%==3120 &; if %fattype%==FAT12 && set secpclus=x02 && set mediabyt=xF0 ! if %fattype%==FAT16 && set secpclus=x01 && set mediabyt=xF0
 #NEW## F0 = not good with Scandisk (MSDOS622?) ??
 #SOMETIMEsaddedByMSDOS622ScandiskToFAT's#if %FLOPTYPE%==2880 &; if %fattype%==FAT12 && set secpclus=x02 && set mediabyt=xF9 ! if %fattype%==FAT16 && set secpclus=x01 && set mediabyt=xF9
-#ORG#
 if %FLOPTYPE%==2880 &; if %fattype%==FAT12 && set secpclus=x02 && set mediabyt=xF0 ! if %fattype%==FAT16 && set secpclus=x01 && set mediabyt=xF0
-#####
+#-------------------#
 if %FLOPTYPE%==2400 &; if %fattype%==FAT12 && set secpclus=x02 && set mediabyt=xF9 ! if %fattype%==FAT16 && set secpclus=x01 && set mediabyt=xF9
 #NoFAT16possible#
 if %FLOPTYPE%==1920 &; if %fattype%==FAT12 && set secpclus=x01 && set mediabyt=xF0
@@ -961,10 +951,10 @@ if %FLOPTYPE%==3200 &; if %fattype%==FAT12 && set fatsz16=x0A\x00 && if not exis
 #FAT12:BadWithMSDOS622#if %FLOPTYPE%==3200 &; if %fattype%==FAT12 && set fatsz16=x0A\x00 && set rootentr=xF0\x01 ! if %fattype%==FAT16 && set fatsz16=x19\x00 && set rootentr=x00\x02
 if %FLOPTYPE%==3120 &; if %fattype%==FAT12 && set fatsz16=x0A\x00 && if not exist rootentr && set rootentr=xF0\x00 ! if %fattype%==FAT16 && set fatsz16=x19\x00 && if not exist rootentr && set rootentr=x00\x02
 #BadWithMSDOS622#if %FLOPTYPE%==3120 &; if %fattype%==FAT12 && set fatsz16=x0A\x00 && set rootentr=xF0\x01 ! if %fattype%==FAT16 && set fatsz16=x19\x00 && set rootentr=x00\x02
-#NEW=>Standard#
+## NEW=>Standard
 if %FLOPTYPE%==2880 &; if %fattype%==FAT12 && set fatsz16=x09\x00 && if not exist rootentr && set rootentr=xF0\x00 ! if %fattype%==FAT16 && set fatsz16=x17\x00 && if not exist rootentr && set rootentr=x00\x02
 #FAT12:BadWithMSDOS622#if %FLOPTYPE%==2880 &; if %fattype%==FAT12 && set fatsz16=x09\x00 && set rootentr=xF0\x01 ! if %fattype%==FAT16 && set fatsz16=x17\x00 && set rootentr=x00\x02
-###############
+#-------------------#
 if %FLOPTYPE%==2400 &; if %fattype%==FAT12 && set fatsz16=x07\x00 && if not exist rootentr && set rootentr=xF0\x00 ! if %fattype%==FAT16 && set fatsz16=x13\x00 && if not exist rootentr && set rootentr=x00\x02
 #FAT12:BadWithMSDOS622#if %FLOPTYPE%==2400 &; if %fattype%==FAT12 && set fatsz16=x07\x00 && set rootentr=xF0\x01 ! if %fattype%==FAT16 && set fatsz16=x13\x00 && set rootentr=x00\x02
 #NoFAT16possible#
@@ -1007,7 +997,6 @@ raw write (rd)%offsetf2%+1 \%writefat% > nul || echo Bad write of start of secon
 goto :eof
 ::
 :fatinfo
-#OKE_XXvars##echo -n > (md)0x302+60 && set > (md)0x302+60 && raw cat --locate=\x0A (md)0x302+60 > nul &; echo %0 NUMVARS=%@retval% && cat --locate=\x0A --replace=\x20 (md)0x302+60 && raw cat (md)0x302+60 && echo && echo -n && pause Press a Key to Continue... && echo
 setlocal && set * && set "Q=%Q%" && set ptstart=%ptstart% && set disk=%disk% && set imgsize=%imgsize% && set rdsize=%rdsize% && set "NULL=%NULL%"
 call :read 0x1FE (rd)%ptstart%+1 &; set /A magicbyt=%result%&0xffff &; if not %magicbyt%==0xAA55 && echo Invalid Magic Byte: %magicbyt% && endlocal && set result=0 && goto :eof
 call :read 0xB (rd)%ptstart%+1 &; set /A bytepsec=%result%&0xffff &; if not %bytepsec%==512 && echo Invalid Bytes per sector: %bytepsec% && endlocal && set result=0 && goto :eof
@@ -1051,7 +1040,6 @@ echo Total clusters:         %numclus%
 if %fattype%==FAT32 && echo Free clusters:          %freeclus%
 set /a cylinder=%totsect%+%hiddsect%/%numheads%/%sectrack% &; if %disk:~1,2%==fd && echo Number of tracks:       %cylinder% ! echo -e Cylinders in use:       %cylinder%\t  (includes hidden sectors)
 #NOTSOGOOD#set /a cylinder=%imgsize%>>9 / %numheads% / %sectrack% &; if %disk:~1,2%==fd && echo Number of tracks:       %cylinder% ! echo Number of cylinders:    %cylinder%
-#OKE_XXvars##echo -n > (md)0x302+60 && set > (md)0x302+60 && raw cat --locate=\x0A (md)0x302+60 > nul &; echo %0 NUMVARS=%@retval% && cat --locate=\x0A --replace=\x20 (md)0x302+60 && raw cat (md)0x302+60 && echo && echo -n && pause Press a Key to Continue... && echo
 set /A dataarea=%rootsect% + %secpfat% + %secpfat% + %reserved% * %bytepsec% &; set /a bytedata=%totsect% * %bytepsec% - %dataarea% && set /a byteclus=%numclus% * %secpclus% * %bytepsec% &; set /a paddsect=%bytedata%-%byteclus%/%bytepsec% &; if %paddsect%>=0 && echo Padding sectors:        %paddsect% ! echo $[0x0F]Padding sectors:        %paddsect% - BUG, please report! && set result=0
 #NOTGOOD#set /A dataarea=%rootsect% + %secpfat% + %secpfat% + %reserved% * %bytepsec% &; set /a bytedata=%totsect% - %ptstart% * %bytepsec% - %dataarea% && set /a byteclus=%numclus% * %secpclus% * %bytepsec% &; set /a paddsect=%bytedata%-%byteclus%/%bytepsec% &; if %paddsect%>=0 && echo Padding sectors:        %paddsect% ! echo $[0x0F]Padding sectors:        %paddsect% - BUG, please report! && set result=0
 set /a drvspace=%numclus% * %secpclus% >>1
@@ -1086,7 +1074,7 @@ if %imageoke%==Y && goto :imageoke
 if %delimg%==Y && set delimg= &; call :deleteFILE &; if %result%==0 && endlocal && set result=0 && goto :eof
 if %?_BOOT%==fat &; if not %delimg%==Y && fat dir %DEVICE%%%PATH:~0,-1% > nul |; echo -n > (md)0x300+1 && echo %PATH% > (md)0x300+1 && raw cat --locate=/ --replace=\x0A (md)0x300+1 > nul && raw cat (md)0x300+1 | call :makepath &; if %result%==0 && endlocal && set result=0 && goto :eof
 if %?_BOOT%==fatlfn &; if not %delimg%==Y && set result= && FATLFN.LLL dir "%DEVICE%%%PATH:~0,-1%" "> nul" &; if not %result%>=0 && echo -n > (md)0x300+1 && echo %PATH% > (md)0x300+1 && raw cat --locate=/ --replace=\x0A (md)0x300+1 > nul && raw cat (md)0x300+1 | call :makepath &; if %result%==0 && endlocal && set result=0 && goto :eof
-#noneed#set "FILE=%DEVICE%%%PATH%%%NAME%%%EXT%
+#NONEED#set "FILE=%DEVICE%%%PATH%%%NAME%%%EXT%
 set delimg=
 :nextimage
 if %n%>=1 && set fatdev= && set freeKB= && call :fatdev "%DEVICE%" &; if not %freeKB%>=%needKB% &; if not "%Q%"=="/Q" && echo Not enough space on %fatdev%: needed %needKB%KB, available %freeKB%KB ! set "Q=%Q%" &; endlocal && set result=0 && goto :eof
@@ -1103,8 +1091,8 @@ if %filesize%==%imgsize% && if not "%Q%"=="/Q" && call :Fn.5 0 %v0%
 :imageoke
 blocklist %FILE% | set block=
 call Fn.11 "%block:~6%" "," && set numplus=2 ! set numplus=1
-if %numplus%==1 && if not %contigu%==Y &; if not "%Q%"=="/Q" && echo -e Image$[0x00]"$[]'%FILE%'$[0x00]"$[]is contiguous! ! set "Q=%Q%" &; endlocal && goto :eof
-if %numplus%==1 && if %contigu%==Y &; if not "%Q%"=="/Q" && echo -e Image$[0x00]"$[]'%FILE%'$[0x00]"$[]is contiguous! ! set "Q=%Q%" &; call :deleteBK09 &; endlocal && goto :eof
+if %numplus%==1 && if not %contigu%==Y &; if not "%Q%"=="/Q" && echo -e Image$[0x00]"$[]'%FILE%'$[0x00]"$[]is contiguous!\x20\x20\x20\x20\x20 ! set "Q=%Q%" &; endlocal && goto :eof
+if %numplus%==1 && if %contigu%==Y &; if not "%Q%"=="/Q" && echo -e Image$[0x00]"$[]'%FILE%'$[0x00]"$[]is contiguous!\x20\x20\x20\x20\x20 ! set "Q=%Q%" &; call :deleteBK09 &; endlocal && goto :eof
 if %numplus%>=2 && if not "%Q%"=="/Q" && echo -e Image$[0x00]"$[]'%FILE%'$[0x00]"$[]is not contiguous!
 if not %contigu%==Y && endlocal && goto :eof
 errorcheck off
@@ -1221,7 +1209,6 @@ errorcheck off
 if %?_BOOT%==fat &; if %retry%>=3 &; if not "%Q%"=="/Q" && echo Abort: copy (rd)+1 to '%FILE%' failed, '%FILE%' will be deleted ! set "Q=%Q%" &; fat del %FILE% > nul && endlocal && set result=0 && goto :eof ! if not "%Q%"=="/Q" && echo Can not delete '%FILE%' && endlocal && set result=0 && goto :eof ! endlocal && set result=0 && goto :eof
 if %?_BOOT%==fatlfn &; if %retry%>=3 &; if not "%Q%"=="/Q" && echo -e Abort: copy (rd)+1 to$[0x00]"$[]'%FILE%'$[0x00]"$[]failed,$[0x00]"$[]%FILE%'$[0x00]"$[]will be deleted ! set "Q=%Q%" &; set result= && FATLFN.LLL del "%FILE%" &; if %result%==1 && endlocal && set result=0 && goto :eof ! if not "%Q%"=="/Q" && echo -e Can not delete$[0x00]"$[]'%FILE%'$[0x00]" && endlocal && set result=0 && goto :eof ! endlocal && set result=0 && goto :eof
 if not exist NULL &; call :Fn.4 &; set v0=%v% && set v= && set h= &; echo -n -e $[0x0F]Wait: dd copies Ram-disk (rd)+1 to$[0x00]"$[0x0F]'%FILE%'...$[0x00]" &; if %retry%>=1 && echo -e \x20retry: %retry% out of 2
-#XTRA##OKE_XXvars##echo -n > (md)0x302+60 && set > (md)0x302+60 && raw cat --locate=\x0A (md)0x302+60 > nul &; echo %0 NUMVARS=%@retval% && cat --locate=\x0A --replace=\x20 (md)0x302+60 && raw cat (md)0x302+60 && echo && echo -n && pause Press a Key to Continue... && echo
 if not %rdbase%>=64m && if exist %FILE% &; raw dd if=(rd)+1 of=%FILE% > nul || echo -e Retry dd-copy %disk% to$[0x00]"$[]'%FILE%'$[0x00]" && set /a retry=%retry%+1 && goto :loopddcopyback
 if %rdbase%>=64m && if exist %FILE% && if exist @uefi &; raw dd if=(rd)+1 of=%FILE% > nul || echo -e Retry dd-copy %disk% to$[0x00]"$[]'%FILE%'$[0x00]" && set /a retry=%retry%+1 && goto :loopddcopyback
 if %rdbase%>=64m && if exist %FILE% && if not exist @uefi &; raw dd if=(rd)+1 of=%FILE% buf=%mdbuf% buflen=%mdbuflen% > nul || echo -e Retry dd-copy %disk% to$[0x00]"$[]'%FILE%'$[0x00]" && set /a retry=%retry%+1 && goto :loopddcopyback
@@ -1237,12 +1224,11 @@ if not %rdsize%==%imgsize% &; if not exist %FILE% && echo -e Something went wron
 #MAYBE#crc32 (rd)+1 | set crc32rd=
 #MAYBE#endlocal && set crc32rd=%crc32rd%
 if not "%Q%"=="/Q" && echo -e $[]dd copied Ram-disk (rd)+1 to$[0x00]"$[]'%FILE%'$[0x00]" && set result=1 ! set result=1
-#OKE_XXvars##echo && echo -n > (md)0x302+60 && set > (md)0x302+60 && raw cat --locate=\x0A (md)0x302+60 > nul &; echo %0 NUMVARS=%@retval% && cat --locate=\x0A --replace=\x20 (md)0x302+60 && raw cat (md)0x302+60 && echo && echo -n && pause Press a Key to Continue... && echo
 endlocal && set result=%result% && set "RAMDISK=%RAMDISK%"
 goto :eof
 ::
 :checkramdiskandimage
-#MAYBE different with/ without /COPY (gives argument "ASK")
+#-# MAYBE different with/ without /COPY (gives argument "ASK")
 #TODO#if "%~1"=="ASK" &&
 setlocal
 #MAYBE#if exist @uefi && if exist RAMDISK &; setlocal && %RAMDISK% &; endlocal && set disk=%disk% && set LOG=%LOG% && set crc32rd=%crc32rd%
@@ -1473,18 +1459,18 @@ goto :eof
 :mbrbootcodeMSDOS71
 setlocal && set *
 set "target=%~1"
-#LAST FOUR bytes different on LIMBO x86 (hd0) in MBR part (values instead of zeros!): \xEB\xB8\x00\x00\x80\x03\x05\x12
-#MSDOS71-A#
+## LAST FOUR bytes different on LIMBO x86 (hd0) in MBR part (values instead of zeros!): \xEB\xB8\x00\x00\x80\x03\x05\x12
+## MSDOS71-A
 raw write %target% \x33\xC0\x8E\xD0\xBC\x00\x7C\xFB\x50\x07\x50\x1F\xFC\xBE\x1B\x7C\xBF\x1B\x06\x50\x57\xB9\xE5\x01\xF3\xA4\xCB\xBE\xBE\x07\xB1\x04\x38\x2C\x7C\x09\x75\x15\x83\xC6\x10\xE2\xF5\xCD\x18\x8B\x14\x8B\xEE\x83\xC6\x10\x49\x74\x16\x38\x2C\x74\xF6\xBE\x10\x07\x4E\xAC\x3C\x00\x74\xFA\xBB\x07\x00\xB4\x0E\xCD\x10\xEB\xF2\x89\x46\x25\x96\x8A\x46\x04\xB4\x06\x3C\x0E\x74\x11\xB4\x0B\x3C\x0C\x74\x05\x3A\xC4\x75\x2B\x40\xC6\x46\x25\x06\x75\x24\xBB\xAA\x55\x50\xB4\x41\xCD\x13\x58\x72\x16\x81\xFB\x55\xAA\x75\x10\xF6\xC1\x01\x74\x0B\x8A\xE0\x88\x56\x24\xC7\x06\xA1\x06\xEB\x1E\x88\x66\x04\xBF\x0A\x00\xB8\x01\x02\x8B\xDC\x33\xC9\x83\xFF\x05\x7F\x03\x8B\x4E\x25\x03\x4E\x02\xCD\x13\x72\x29\xBE\x46\x07\x81\x3E\xFE\x7D\x55\xAA\x74\x5A\x83\xEF\x05\x7F\xDA\x85\xF6\x75\x83\xBE\x27\x07\xEB\x8A\x98\x91\x52\x99\x03\x46\x08\x13\x56\x0A\xE8\x12\x00\x5A\xEB\xD5\x4F\x74\xE4\x33\xC0\xCD\x13\xEB\xB8\x00\x00\x00\x00\x00\x00\x56\x33\xF6\x56\x56\x52\x50\x06\x53\x51\xBE\x10\x00\x56\x8B\xF4\x50\x52\xB8\x00\x42\x8A\x56\x24\xCD\x13\x5A\x58\x8D\x64\x10\x72 > nul
 if %@retval%>=1 && set result=1 ! set result=0 &; if %result%==0 && endlocal && set result=%result% && goto :eof
-#START of partition information on LIMBO x86 (hd0): \x80\x01\x01\x00\x0B\x7F\xBF\x07\x3F\x00\x00\x00\xC1\xFB\x3F\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x55\xAA
-#MSDOS71-B#
+## START of partition information on LIMBO x86 (hd0): \x80\x01\x01\x00\x0B\x7F\xBF\x07\x3F\x00\x00\x00\xC1\xFB\x3F\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x55\xAA
+## MSDOS71-B
 raw write --offset=256 %target% \x0A\x40\x75\x01\x42\x80\xC7\x02\xE2\xF7\xF8\x5E\xC3\xEB\x74\x49\x6E\x76\x61\x6C\x69\x64\x20\x70\x61\x72\x74\x69\x74\x69\x6F\x6E\x20\x74\x61\x62\x6C\x65\x00\x45\x72\x72\x6F\x72\x20\x6C\x6F\x61\x64\x69\x6E\x67\x20\x6F\x70\x65\x72\x61\x74\x69\x6E\x67\x20\x73\x79\x73\x74\x65\x6D\x00\x4D\x69\x73\x73\x69\x6E\x67\x20\x6F\x70\x65\x72\x61\x74\x69\x6E\x67\x20\x73\x79\x73\x74\x65\x6D\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x8B\xFC\x1E\x57\x8B\xF5\xCB\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00 > nul
-#MSDOS71-B=DiskID+MBR-entries
+## MSDOS71-B=DiskID+MBR-entries
 #\x00\x00\x00\x00\x00\x00\x80\x01\x01\x00\x01\x0F\x3F\x1E\x3F\x00\x00\x00\xD1\x79\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x55\xAA
 if %@retval%>=1 && set result=1 ! set result=0
 if not %result%==0 &; raw write --offset=510 %target% \x55\xAA > nul && set result=1 ! set result=0
-#NEW-WriteMysteryBytes
+## NEW-WriteMysteryBytes
 if not %result%==0 &; raw write --offset=220 %target% \x80\x%@time:~6,2%\x%@time:~3,2%\x%@time:~0,2% > nul
 endlocal && set result=%result%
 goto :eof
@@ -1492,13 +1478,13 @@ goto :eof
 :mbrbootcodeMSDOS33
 setlocal && set *
 set "target=%~1"
-#MSDOS33-A#
+## MSDOS33-A
 raw write %target% \xFA\x33\xC0\x8E\xD0\xBC\x00\x7C\x8B\xF4\x50\x07\x50\x1F\xFB\xFC\xBF\x00\x06\xB9\x00\x01\xF2\xA5\xEA\x1D\x06\x00\x00\xBE\xBE\x07\xB3\x04\x80\x3C\x80\x74\x0E\x80\x3C\x00\x75\x1C\x83\xC6\x10\xFE\xCB\x75\xEF\xCD\x18\x8B\x14\x8B\x4C\x02\x8B\xEE\x83\xC6\x10\xFE\xCB\x74\x1A\x80\x3C\x00\x74\xF4\xBE\x8B\x06\xAC\x3C\x00\x74\x0B\x56\xBB\x07\x00\xB4\x0E\xCD\x10\x5E\xEB\xF0\xEB\xFE\xBF\x05\x00\xBB\x00\x7C\xB8\x01\x02\x57\xCD\x13\x5F\x73\x0C\x33\xC0\xCD\x13\x4F\x75\xED\xBE\xA3\x06\xEB\xD3\xBE\xC2\x06\xBF\xFE\x7D\x81\x3D\x55\xAA\x75\xC7\x8B\xF5\xEA\x00\x7C\x00\x00\x49\x6E\x76\x61\x6C\x69\x64\x20\x70\x61\x72\x74\x69\x74\x69\x6F\x6E\x20\x74\x61\x62\x6C\x65\x00\x45\x72\x72\x6F\x72\x20\x6C\x6F\x61\x64\x69\x6E\x67\x20\x6F\x70\x65\x72\x61\x74\x69\x6E\x67\x20\x73\x79\x73\x74\x65\x6D\x00\x4D\x69\x73\x73\x69\x6E\x67\x20\x6F\x70\x65\x72\x61\x74\x69\x6E\x67\x20\x73\x79\x73\x74\x65\x6D\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00 > nul
 if %@retval%>=1 && set result=1 ! set result=0 &; if %result%==0 && endlocal && set result=%result% && goto :eof
-#MSDOS33-B#
+## MSDOS33-B
 raw write --offset=256 %target% \x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00 > nul
 if %@retval%>=1 && set result=1 ! set result=0
-#MSDOS33-B=DiskID+MBR-entries
+## MSDOS33-B=DiskID+MBR-entries
 #\x00\x00\x00\x00\x00\x00\x80\x01\x01\x00\x01\x0F\x3F\x1E\x3F\x00\x00\x00\xD1\x79\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x55\xAA
 if not %result%==0 &; raw write --offset=510 %target% \x55\xAA > nul && set result=1 ! set result=0
 endlocal && set result=%result%
@@ -1507,12 +1493,12 @@ goto :eof
 :mbrbootcodeNT5
 setlocal && set *
 set "target=%~1"
-#NT5-A#
+## NT5-A
 raw write %target% \x33\xC0\x8E\xD0\xBC\x00\x7C\xFB\x50\x07\x50\x1F\xFC\xBE\x1B\x7C\xBF\x1B\x06\x50\x57\xB9\xE5\x01\xF3\xA4\xCB\xBD\xBE\x07\xB1\x04\x38\x6E\x00\x7C\x09\x75\x13\x83\xC5\x10\xE2\xF4\xCD\x18\x8B\xF5\x83\xC6\x10\x49\x74\x19\x38\x2C\x74\xF6\xA0\xB5\x07\xB4\x07\x8B\xF0\xAC\x3C\x00\x74\xFC\xBB\x07\x00\xB4\x0E\xCD\x10\xEB\xF2\x88\x4E\x10\xE8\x46\x00\x73\x2A\xFE\x46\x10\x80\x7E\x04\x0B\x74\x0B\x80\x7E\x04\x0C\x74\x05\xA0\xB6\x07\x75\xD2\x80\x46\x02\x06\x83\x46\x08\x06\x83\x56\x0A\x00\xE8\x21\x00\x73\x05\xA0\xB6\x07\xEB\xBC\x81\x3E\xFE\x7D\x55\xAA\x74\x0B\x80\x7E\x10\x00\x74\xC8\xA0\xB7\x07\xEB\xA9\x8B\xFC\x1E\x57\x8B\xF5\xCB\xBF\x05\x00\x8A\x56\x00\xB4\x08\xCD\x13\x72\x23\x8A\xC1\x24\x3F\x98\x8A\xDE\x8A\xFC\x43\xF7\xE3\x8B\xD1\x86\xD6\xB1\x06\xD2\xEE\x42\xF7\xE2\x39\x56\x0A\x77\x23\x72\x05\x39\x46\x08\x73\x1C\xB8\x01\x02\xBB\x00\x7C\x8B\x4E\x02\x8B\x56\x00\xCD\x13\x73\x51\x4F\x74\x4E\x32\xE4\x8A\x56\x00\xCD\x13\xEB\xE4\x8A\x56\x00\x60\xBB\xAA\x55\xB4\x41\xCD\x13\x72\x36\x81\xFB\x55\xAA\x75\x30\xF6\xC1\x01\x74\x2B\x61\x60 > nul
 if %@retval%>=1 && set result=1 ! set result=0 &; if %result%==0 && endlocal && set result=%result% && goto :eof
-#NT5-B#
+## NT5-B
 raw write --offset=256 %target% \x6A\x00\x6A\x00\xFF\x76\x0A\xFF\x76\x08\x6A\x00\x68\x00\x7C\x6A\x01\x6A\x10\xB4\x42\x8B\xF4\xCD\x13\x61\x61\x73\x0E\x4F\x74\x0B\x32\xE4\x8A\x56\x00\xCD\x13\xEB\xD6\x61\xF9\xC3\x49\x6E\x76\x61\x6C\x69\x64\x20\x70\x61\x72\x74\x69\x74\x69\x6F\x6E\x20\x74\x61\x62\x6C\x65\x00\x45\x72\x72\x6F\x72\x20\x6C\x6F\x61\x64\x69\x6E\x67\x20\x6F\x70\x65\x72\x61\x74\x69\x6E\x67\x20\x73\x79\x73\x74\x65\x6D\x00\x4D\x69\x73\x73\x69\x6E\x67\x20\x6F\x70\x65\x72\x61\x74\x69\x6E\x67\x20\x73\x79\x73\x74\x65\x6D\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x2C\x44\x63 > nul
-#NT5-B=DiskID+MBR-entries#
+## NT5-B=DiskID+MBR-entries
 #\x89\x34\x8A\x34\x00\x00\x80\x01\x01\x00\x0B\x3F\xBF\x13\x3F\x00\x00\x00\xC1\xBA\x20\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x55\xAA
 if %@retval%>=1 && set result=1 ! set result=0
 if not %result%==0 &; raw write --offset=510 %target% \x55\xAA > nul && set result=1 ! set result=0
@@ -1522,12 +1508,12 @@ goto :eof
 :mbrbootcodeVISTA
 setlocal && set *
 set "target=%~1"
-#VISTA-A#
+## VISTA-A
 raw write %target% \x33\xC0\x8E\xD0\xBC\x00\x7C\x8E\xC0\x8E\xD8\xBE\x00\x7C\xBF\x00\x06\xB9\x00\x02\xFC\xF3\xA4\x50\x68\x1C\x06\xCB\xFB\xB9\x04\x00\xBD\xBE\x07\x80\x7E\x00\x00\x7C\x0B\x0F\x85\x10\x01\x83\xC5\x10\xE2\xF1\xCD\x18\x88\x56\x00\x55\xC6\x46\x11\x05\xC6\x46\x10\x00\xB4\x41\xBB\xAA\x55\xCD\x13\x5D\x72\x0F\x81\xFB\x55\xAA\x75\x09\xF7\xC1\x01\x00\x74\x03\xFE\x46\x10\x66\x60\x80\x7E\x10\x00\x74\x26\x66\x68\x00\x00\x00\x00\x66\xFF\x76\x08\x68\x00\x00\x68\x00\x7C\x68\x01\x00\x68\x10\x00\xB4\x42\x8A\x56\x00\x8B\xF4\xCD\x13\x9F\x83\xC4\x10\x9E\xEB\x14\xB8\x01\x02\xBB\x00\x7C\x8A\x56\x00\x8A\x76\x01\x8A\x4E\x02\x8A\x6E\x03\xCD\x13\x66\x61\x73\x1E\xFE\x4E\x11\x0F\x85\x0C\x00\x80\x7E\x00\x80\x0F\x84\x8A\x00\xB2\x80\xEB\x82\x55\x32\xE4\x8A\x56\x00\xCD\x13\x5D\xEB\x9C\x81\x3E\xFE\x7D\x55\xAA\x75\x6E\xFF\x76\x00\xE8\x8A\x00\x0F\x85\x15\x00\xB0\xD1\xE6\x64\xE8\x7F\x00\xB0\xDF\xE6\x60\xE8\x78\x00\xB0\xFF\xE6\x64\xE8\x71\x00\xB8\x00\xBB\xCD\x1A\x66\x23\xC0\x75\x3B\x66\x81\xFB\x54\x43\x50\x41\x75\x32\x81\xF9\x02\x01\x72\x2C\x66\x68\x07 > nul
 if %@retval%>=1 && set result=1 ! set result=0 &; if %result%==0 && endlocal && set result=%result% && goto :eof
-#VISTA-B#
+## VISTA-B
 raw write --offset=256 %target% \xBB\x00\x00\x66\x68\x00\x02\x00\x00\x66\x68\x08\x00\x00\x00\x66\x53\x66\x53\x66\x55\x66\x68\x00\x00\x00\x00\x66\x68\x00\x7C\x00\x00\x66\x61\x68\x00\x00\x07\xCD\x1A\x5A\x32\xF6\xEA\x00\x7C\x00\x00\xCD\x18\xA0\xB7\x07\xEB\x08\xA0\xB6\x07\xEB\x03\xA0\xB5\x07\x32\xE4\x05\x00\x07\x8B\xF0\xAC\x3C\x00\x74\xFC\xBB\x07\x00\xB4\x0E\xCD\x10\xEB\xF2\x2B\xC9\xE4\x64\xEB\x00\x24\x02\xE0\xF8\x24\x02\xC3\x49\x6E\x76\x61\x6C\x69\x64\x20\x70\x61\x72\x74\x69\x74\x69\x6F\x6E\x20\x74\x61\x62\x6C\x65\x00\x45\x72\x72\x6F\x72\x20\x6C\x6F\x61\x64\x69\x6E\x67\x20\x6F\x70\x65\x72\x61\x74\x69\x6E\x67\x20\x73\x79\x73\x74\x65\x6D\x00\x4D\x69\x73\x73\x69\x6E\x67\x20\x6F\x70\x65\x72\x61\x74\x69\x6E\x67\x20\x73\x79\x73\x74\x65\x6D\x00\x00\x00\x00\x62\x7A\x99 > nul
-#VISTA-B=DiskID+MBR-entries#
+## VISTA-B=DiskID+MBR-entries
 #\xFC\x79\x85\x94\x00\x00\x80\x20\x21\x00\x07\xFE\xFF\xFF\x00\x08\x00\x00\x00\xF0\xFF\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x55\xAA
 if %@retval%>=1 && set result=1 ! set result=0
 if not %result%==0 &; raw write --offset=510 %target% \x55\xAA > nul && set result=1 ! set result=0
@@ -1538,12 +1524,12 @@ goto :eof
 #-# Identical to https://thestarman.pcministry.com/asm/mbr/W7MBR.htm
 setlocal && set *
 set "target=%~1"
-#WIN7-A#
+## WIN7-A
 raw write %target% \x33\xC0\x8E\xD0\xBC\x00\x7C\x8E\xC0\x8E\xD8\xBE\x00\x7C\xBF\x00\x06\xB9\x00\x02\xFC\xF3\xA4\x50\x68\x1C\x06\xCB\xFB\xB9\x04\x00\xBD\xBE\x07\x80\x7E\x00\x00\x7C\x0B\x0F\x85\x0E\x01\x83\xC5\x10\xE2\xF1\xCD\x18\x88\x56\x00\x55\xC6\x46\x11\x05\xC6\x46\x10\x00\xB4\x41\xBB\xAA\x55\xCD\x13\x5D\x72\x0F\x81\xFB\x55\xAA\x75\x09\xF7\xC1\x01\x00\x74\x03\xFE\x46\x10\x66\x60\x80\x7E\x10\x00\x74\x26\x66\x68\x00\x00\x00\x00\x66\xFF\x76\x08\x68\x00\x00\x68\x00\x7C\x68\x01\x00\x68\x10\x00\xB4\x42\x8A\x56\x00\x8B\xF4\xCD\x13\x9F\x83\xC4\x10\x9E\xEB\x14\xB8\x01\x02\xBB\x00\x7C\x8A\x56\x00\x8A\x76\x01\x8A\x4E\x02\x8A\x6E\x03\xCD\x13\x66\x61\x73\x1C\xFE\x4E\x11\x75\x0C\x80\x7E\x00\x80\x0F\x84\x8A\x00\xB2\x80\xEB\x84\x55\x32\xE4\x8A\x56\x00\xCD\x13\x5D\xEB\x9E\x81\x3E\xFE\x7D\x55\xAA\x75\x6E\xFF\x76\x00\xE8\x8D\x00\x75\x17\xFA\xB0\xD1\xE6\x64\xE8\x83\x00\xB0\xDF\xE6\x60\xE8\x7C\x00\xB0\xFF\xE6\x64\xE8\x75\x00\xFB\xB8\x00\xBB\xCD\x1A\x66\x23\xC0\x75\x3B\x66\x81\xFB\x54\x43\x50\x41\x75\x32\x81\xF9\x02\x01\x72\x2C\x66\x68\x07\xBB\x00 > nul
 if %@retval%>=1 && set result=1 ! set result=0 &; if %result%==0 && endlocal && set result=%result% && goto :eof
-#WIN7-B#
+## WIN7-B
 raw write --offset=256 %target% \x00\x66\x68\x00\x02\x00\x00\x66\x68\x08\x00\x00\x00\x66\x53\x66\x53\x66\x55\x66\x68\x00\x00\x00\x00\x66\x68\x00\x7C\x00\x00\x66\x61\x68\x00\x00\x07\xCD\x1A\x5A\x32\xF6\xEA\x00\x7C\x00\x00\xCD\x18\xA0\xB7\x07\xEB\x08\xA0\xB6\x07\xEB\x03\xA0\xB5\x07\x32\xE4\x05\x00\x07\x8B\xF0\xAC\x3C\x00\x74\x09\xBB\x07\x00\xB4\x0E\xCD\x10\xEB\xF2\xF4\xEB\xFD\x2B\xC9\xE4\x64\xEB\x00\x24\x02\xE0\xF8\x24\x02\xC3\x49\x6E\x76\x61\x6C\x69\x64\x20\x70\x61\x72\x74\x69\x74\x69\x6F\x6E\x20\x74\x61\x62\x6C\x65\x00\x45\x72\x72\x6F\x72\x20\x6C\x6F\x61\x64\x69\x6E\x67\x20\x6F\x70\x65\x72\x61\x74\x69\x6E\x67\x20\x73\x79\x73\x74\x65\x6D\x00\x4D\x69\x73\x73\x69\x6E\x67\x20\x6F\x70\x65\x72\x61\x74\x69\x6E\x67\x20\x73\x79\x73\x74\x65\x6D\x00\x00\x00\x63\x7B\x9A > nul
-#WINPE-B=DiskID+MBR-entries#
+## WINPE-B=DiskID+MBR-entries
 if %@retval%>=1 && set result=1 ! set result=0
 if not %result%==0 &; raw write --offset=510 %target% \x55\xAA > nul && set result=1 ! set result=0
 endlocal && set result=%result%
@@ -1552,41 +1538,41 @@ goto :eof
 #MAYBELATER#:mbrbootcodeWINPE
 setlocal && set *
 set "target=%~1"
-#WINPE-A#
+## WINPE-A
 raw write %target% \x33\xC0\x8E\xD0\xBC\x00\x7C\x8E\xC0\x8E\xD8\xBE\x00\x7C\xBF\x00\x06\xB9\x00\x02\xFC\xF3\xA4\x50\x68\x1C\x06\xCB\xFB\xB9\x04\x00\xBD\xBE\x07\x80\x7E\x00\x00\x7C\x0B\x0F\x85\x0E\x01\x83\xC5\x10\xE2\xF1\xCD\x18\x88\x56\x00\x55\xC6\x46\x11\x05\xC6\x46\x10\x00\xB4\x41\xBB\xAA\x55\xCD\x13\x5D\x72\x0F\x81\xFB\x55\xAA\x75\x09\xF7\xC1\x01\x00\x74\x03\xFE\x46\x10\x66\x60\x80\x7E\x10\x00\x74\x26\x66\x68\x00\x00\x00\x00\x66\xFF\x76\x08\x68\x00\x00\x68\x00\x7C\x68\x01\x00\x68\x10\x00\xB4\x42\x8A\x56\x00\x8B\xF4\xCD\x13\x9F\x83\xC4\x10\x9E\xEB\x14\xB8\x01\x02\xBB\x00\x7C\x8A\x56\x00\x8A\x76\x01\x8A\x4E\x02\x8A\x6E\x03\xCD\x13\x66\x61\x73\x1C\xFE\x4E\x11\x75\x0C\x80\x7E\x00\x80\x0F\x84\x8A\x00\xB2\x80\xEB\x84\x55\x32\xE4\x8A\x56\x00\xCD\x13\x5D\xEB\x9E\x81\x3E\xFE\x7D\x55\xAA\x75\x6E\xFF\x76\x00\xE8\x8D\x00\x75\x17\xFA\xB0\xD1\xE6\x64\xE8\x83\x00\xB0\xDF\xE6\x60\xE8\x7C\x00\xB0\xFF\xE6\x64\xE8\x75\x00\xFB\xB8\x00\xBB\xCD\x1A\x66\x23\xC0\x75\x3B\x66\x81\xFB\x54\x43\x50\x41\x75\x32\x81\xF9\x02\x01\x72\x2C\x66\x68\x07\xBB\x00 > nul
 if %@retval%>=1 && set result=1 ! set result=0 &; if %result%==0 && endlocal && set result=%result% && goto :eof
-#WINPE-B#
+## WINPE-B
 raw write --offset=256 %target% \x00\x66\x68\x00\x02\x00\x00\x66\x68\x08\x00\x00\x00\x66\x53\x66\x53\x66\x55\x66\x68\x00\x00\x00\x00\x66\x68\x00\x7C\x00\x00\x66\x61\x68\x00\x00\x07\xCD\x1A\x5A\x32\xF6\xEA\x00\x7C\x00\x00\xCD\x18\xA0\xB7\x07\xEB\x08\xA0\xB6\x07\xEB\x03\xA0\xB5\x07\x32\xE4\x05\x00\x07\x8B\xF0\xAC\x3C\x00\x74\x09\xBB\x07\x00\xB4\x0E\xCD\x10\xEB\xF2\xF4\xEB\xFD\x2B\xC9\xE4\x64\xEB\x00\x24\x02\xE0\xF8\x24\x02\xC3\x49\x6E\x76\x61\x6C\x69\x64\x20\x70\x61\x72\x74\x69\x74\x69\x6F\x6E\x20\x74\x61\x62\x6C\x65\x00\x45\x72\x72\x6F\x72\x20\x6C\x6F\x61\x64\x69\x6E\x67\x20\x6F\x70\x65\x72\x61\x74\x69\x6E\x67\x20\x73\x79\x73\x74\x65\x6D\x00\x4D\x69\x73\x73\x69\x6E\x67\x20\x6F\x70\x65\x72\x61\x74\x69\x6E\x67\x20\x73\x79\x73\x74\x65\x6D\x00\x00\x00\x63\x7B\x9A > nul
-#WINPE-B=DiskID+MBR-entries#
-#
+## WINPE-B=DiskID+MBR-entries
+#......
 if %@retval%>=1 && set result=1 ! set result=0
 if not %result%==0 &; raw write --offset=510 %target% \x55\xAA > nul && set result=1 ! set result=0
 endlocal && set result=%result%
 goto :eof
 ::
 #NOT_USED_STANDARD_MBRs_instead#:mbrbootcodeGRUB
-#Boot code only 423 bytes?
+## Boot code only 423 bytes?
 setlocal && set *
 set "target=%~1"
-#GRUB-A#
+## GRUB-A
 raw write %target% \xEB\x5E\x90\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x00\x20\x39\xFF\xFF\x31\xDB\x8E\xD3\xBC\x80\x05\xE8\x00\x00\x5B\x81\xEB\x6A\x00\xC1\xEB\x04\x8C\xC8\x01\xC3\x53\x68\x7B\x00\xCB\x68\x00\x20\x17\xBC\x00\x90\x80\xFA\x00\x74\x02\xB2\x80\x16\x07\xB0\x10\x30\xF6\x31\xDB\xE8\xC2\x00\x72\x29\x0E\x1F\x31\xF6\x31\xFF\xB9\xDF\x00\xFC\xF3\xA5\xBB\xFC\x1F\x66\xB8\x47\x52\x55\xAA\x66\x39\x07\x75\x03\xE8\x98\x19\xEA\xB8\x00\x00\x20\x16\x1F\x66\x39\x07\x74\x1F\x80\xF2\x80\x68\xC0\x07\x07\xB0\x10\x30\xF6\x31\xDB\xE8\x87\x00\x72\x05\xEA\x00\x00\xC0\x07\xBE\x92\x01\xE8\xAF\x00\xEB\xFE\xBE\xBE\x01\xE8\x04\x10\xF6\x06\xA4\x01\x80\x0F\x84\x6C\x19\x83\xC6\x0C\x81\xFE\xFE\x01\x72\xEB\x77\x2D\xF6\x06\xA7\x01\x01\x0F\x85\x1E > nul
 if %@retval%>=1 && set result=1 ! set result=0 &; if %result%==0 && endlocal && set result=%result% && goto :eof
-#GRUB-B=167 bytes?!#
+## GRUB-B=167 bytes?!
 raw write --offset=256 %target% \x17\x80\x0E\xA7\x01\x01\xF6\x06\xA7\x01\x02\x75\xD4\x68\x00\x0D\x07\xB0\x04\x31\xD2\x31\xDB\xE8\x3C\x00\x73\xC2\xBE\xAD\x1C\xE8\x69\x00\xE9\xFA\x16\xF6\x06\xA7\x01\x01\x0F\x85\xF1\x16\x80\x0E\xA7\x01\x01\xE9\xD2\x16\x1E\x06\x52\x56\x57\x55\xF9\xCD\x13\x5D\x5F\x5E\x5A\x07\x1F\xC3\xFA\xB8\x00\x20\x8E\xD0\xBC\xDC\x8F\xFB\x66\x61\x07\x1F\xEB\x97\xB4\x02\xBF\x03\x00\xB9\x01\x00\x60\x50\x53\x51\xFE\xC8\x00\xC1\xD0\xE0\x00\xC7\xB0\x01\xE8\xC7\xFF\x59\x5B\x58\x72\x04\xFE\xC8\x75\xE7\x61\x73\x0B\x60\x31\xC0\xE8\xB5\xFF\x61\x4F\x75\xD9\xF9\xC3\xB4\x0E\xCD\x10\x2E\xAC\x3C\x00\x75\xF6\xC3\x0D\x0A\x4D\x69\x73\x73\x69\x6E\x67\x20\x68\x65\x6C\x70\x65\x72\x2E\x00\x00\x3F\xFF > nul
-#GRUB-B=
+## GRUB-B=...
 if %@retval%>=1 && set result=1 ! set result=0
 if not %result%==0 &; raw write --offset=510 %target% \x55\xAA > nul && set result=1 ! set result=0
 endlocal && set result=%result%
 goto :eof
 ::
 :mbrbootcodeZERO
-#TOTAL 440 bytes zeroing!#
+#-# TOTAL 440 bytes zeroing!
 setlocal && set *
 set "target=%~1"
-#ZERO-A#
+## ZERO-A
 raw write %target% \x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00 > nul
 if %@retval%>=1 && set result=1 ! set result=0 &; if %result%==0 && endlocal && set result=%result% && goto :eof
-#ZERO-B#
+## ZERO-B
 raw write --offset=256 %target% \x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00 > nul
 if %@retval%>=1 && set result=1 ! set result=0
 if not %result%==0 &; raw write --offset=510 %target% \x55\xAA > nul && set result=1 ! set result=0
@@ -1728,7 +1714,7 @@ endlocal && set result=%result%
 goto :eof
 ::
 :pbrbootcodeVISTAFAT32
-#-#+ Based on
+#-#+ Based on .... ?
 setlocal && set *
 set "target=%~1"
 raw write --offset=0 %target%+1 \xEB\x58\x90MSWIN4.1 > nul && set result=1 ! set result=0
@@ -1750,7 +1736,7 @@ endlocal && set result=%result%
 goto :eof
 ::
 :pbrbootcodeWIN7FAT32
-#-#+ Based on
+#-#+ Based on ... ?
 setlocal && set *
 set "target=%~1"
 raw write --offset=0 %target%+1 \xEB\x58\x90MSDOS5.0 > nul && set result=1 ! set result=0
@@ -1784,7 +1770,7 @@ endlocal && set result=%result%
 goto :eof
 ::
 #MAYBELATER#:pbrbootcodeWINPEFAT32
-#-#+ Based on br_fat32pe...
+##-#+ Based on br_fat32pe...
 setlocal && set *
 set "target=%~1"
 raw write --offset=0 %target%+1 \xEB\x58\x90MSWIN4.1 > nul && set result=1 ! set result=0
@@ -1796,7 +1782,7 @@ endlocal && set result=%result%
 goto :eof
 ::
 :pbrbootcodeREACTOSFAT
-#-#+ fat.bin on ReactOS-0.4.14-release-110-g3aedb6e.iso
+#-#+ Based on fat.bin on ReactOS-0.4.14-release-110-g3aedb6e.iso
 setlocal && set *
 set "target=%~1"
 raw write --offset=0 %target%+1 \xEB\x3C\x90\x46\x72\x4C\x64\x72\x31\x2E\x30 > nul && set result=1 ! set result=0
@@ -1806,7 +1792,7 @@ endlocal && set result=%result%
 goto :eof
 ::
 :pbrbootcodeREACTOSFAT32
-#-#+ fat32.bin on ReactOS-0.4.14-release-110-g3aedb6e.iso
+#-#+ Based on fat32.bin on ReactOS-0.4.14-release-110-g3aedb6e.iso
 setlocal && set *
 set "target=%~1"
 raw write --offset=0 %target%+1 \xEB\x58\x90\x46\x72\x4C\x64\x72\x31\x2E\x30 > nul && set result=1 ! set result=0
@@ -1927,7 +1913,7 @@ goto :looplsspaces
 :help
 clear
 pager on
-echo MKFATIMG.G4B v0.5 (20250203), by deomsh
+echo MKFATIMG.G4B v0.6 (20250725), by deomsh
 echo Use 1:    MKFATIMG.G4B --size=n|--sectors=N|--CHS=C/H/S FILE switches
 echo Switches: [/HDD|/FDD] [/FAT12|/FAT16|/FAT32] [/V:VOLUMENAME] [/BOOT[:OS]]
 echo $[]          [/NOTACTIVE] [/LOG] [/CON] [/R] [/SPT:S] [/HEADS:H] [/ROOTENTR:n]
@@ -1988,7 +1974,7 @@ echo /BOOT => auto-write MS-DOS 3.3/7.1 MBR (with HDD) and PBR bootcode
 echo $[] On FAT12/16 standard MS-DOS 3.3 (old) MBR
 echo /BOOT:OS => OS: MSDOS33 MSDOS40 MSDOS50 MSDOS71 NT5 VISTA WIN7 WIN8 WIN10 FREEDOS
 echo $[] REACTOS GRUB (GRUB bootcode in PBR only, MBR is standard bootcode)
-#####to test: ZERO#
+#TOTEST#: ZERO
 echo $[] If MSDOS71 is forced, always in MBR; PBR is auto, depending on FAT-type
 echo $[] Bootcodes MSDOS33/MSDOS40/MSDOS50 is not compatible with FAT32
 echo $[] Boot code of NT5 is same for W2K and XP
@@ -2076,3 +2062,5 @@ echo Example:  MKFATIMG.G4B (hd1,0)/BOOTCD.IMG /COPY
 if not exist pagerstst && goto :eof
 #MAYBE?#echo Example:  MKFATIMG.G4B --size=34m (hd2,0)/hddimage.img /v:MYFIRSTEFIHD /BOOT:EFI
 goto :eov
+#FORTESTING#
+#OKE_XXvars##echo -n > (md)0x302+60 && set > (md)0x302+60 && raw cat --locate=\x0A (md)0x302+60 > nul &; echo %0 NUMVARS=%@retval% && cat --locate=\x0A --replace=\x20 (md)0x302+60 && raw cat (md)0x302+60 && echo && echo -n && pause Press a Key to Continue... && echo
