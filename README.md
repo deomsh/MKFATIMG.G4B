@@ -3,7 +3,7 @@
 Switches: [/HDD|/FDD] [/FAT12[:nk]|/FAT16[:nk]|/FAT32[:nk]] [/V:VOLUMENAME]
           [/BOOT[:OS]] [/NOTACTIVE] [/LOG] [/CON] [/R] [/SPT:S] [/HEADS:H]
           [/ROOTENTR:n] [/RSRV:n] [/SPC:n] [/NOTRM] [/FHD] [/HIDDSEC:n]
-          [/RDBASE:n] [/RDSIZE:n] [/HIDDSEC:n] [/Q|/T] [/Y]
+          [/RDBASE:n] [/RDSIZE:n] [/Q|/T] [/Y]
 
 Use 2:    MKFATIMG.G4B FILE /F:floppysize switches
 Switches: [/V:VOLUMENAME] [/BOOT[:OS]] [/FAT16|/FAT32] [/CON] [/RSRV:n]
