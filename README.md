@@ -63,7 +63,7 @@ Copy Ram-Disk afterwards to Image file (see 'Use 4' above)</code></pre>
 V0.7:  
 NEW: with switch /BOOT on Floppy always (newly added) MSWIN4.0 Boot Code, includes WINBOOT.SYS (FAT12/ FAT16 only)  
 NEW: switch /HIDDSEC:n to set (fake) number of hidden sectors on Floppy
-NEW: max size 2048TB, on (partial) Ram-Disk only (size rounded down)  
+NEW: max size 2048g, on (partial) Ram-Disk only (size rounded down)  
 NEW: partition/ volume --size=n/ --sectors=n leading to more than 1024 cylinders allowed (partition type auto 0E/0C)  
 NEW: with --CHS=C/H/S max 1025 cylinders allowed on hard disk (one for mandatory test cylinder)  
 NEW: cleaning memory with dd and check with cmp (max 3GB)  
