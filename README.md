@@ -120,8 +120,8 @@ V0.3: first published version
 #### Example of making preset Floppy Disk Image with switch Volume-name and Contiguous with switch /CON 
 ![MKFATIMG G4B v0 7 (hd0,0)-MyImage IMG -F=2880 -V=F2880KIMAGE (FDD FAT12, contiguous)](https://github.com/user-attachments/assets/45a8c0ec-b7d6-453b-82fb-3d7f831c75e6)
 
-#### Example of making Bootable Image with Argument --size=n and force FAT16 with switch (Auto-settings Geometry, HDD and MS-DOS 7 Boot Code here)
-![MKFATIMG G4B --size=2g -H2GFAT16 IMG -V=HDD2GBFAT16 -FAT16 -BOOT](https://github.com/user-attachments/assets/755e7241-b7e4-4ac1-bbb7-500bc16356e5)
+#### Example of making Bootable Image with Argument --size=n and force FAT16 with switch (Auto-settings Geometry, HDD and MS-DOS 5-7 Boot Code here)
+![MKFATIMG G4B --size=2g -H2GFAT16 IMG -V=HDD2GBFAT16 -FAT16 -BOOT](https://github.com/user-attachments/assets/4c0fda97-fb09-44f8-a83e-ecf3721a7830)
 
 #### Example of making Image with Argument --sectors and Long File Name on Root and Auto-settings (here Geometry, HDD and FAT16)
 ![MKFATIMG G4B --sectors=0x100000 ''-Image with max 1m Sectors IMG''](https://github.com/user-attachments/assets/62178710-1cf2-4853-b161-c51b45356768)
