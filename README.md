@@ -109,7 +109,7 @@ New Boot Codes: MSDOS33 and MSDOS40 (in PBR)
 V0.3: first published version  
 
 ### SCREENSHOTS
-![MKFATIMG G4B v0 7 VERSION and TEXTSTAT](https://github.com/user-attachments/assets/b3609a96-110d-4c2d-9420-011837b23d93)
+![MKFATIMG G4B v0 8 VERSION and TEXTSTAT](https://github.com/user-attachments/assets/84419014-6a38-4304-bba1-bf375a583e44)
 
 #### Small Help:
 ![MKFATIMG G4B Small-help v0 8](https://github.com/user-attachments/assets/672366da-eaf3-40a4-a23c-867bea465e1c)
