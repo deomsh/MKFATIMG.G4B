@@ -2258,8 +2258,8 @@ if exist pagersts && echo Example:  MKFATIMG.G4B --CHS=144/64/32 /CALEB144.IMG /
 if exist pagersts && echo Example:  MKFATIMG.G4B --size=4g (hd2,0)/hddimage.img /V:MYFIRSTBIGHD /BOOT:NT5
 if exist pagersts && echo Example:  MKFATIMG.G4B /HDDTYPE.IMG /D:25 /V:SPECIALTYPE /BOOT:FREEDOS
 echo Example:  MKFATIMG.G4B /HDDTYPE.IMG /D:25 /HEADS:16 /SPT:63 /BOOT /NOTACTIVE
-if exist pagersts && echo Example:  MKFATIMG.G4B --CHS=24/2/15 (hd1,0)/BOOTCD.IMG /BOOT:GRUB /Q
-echo Example:  MKFATIMG.G4B --CHS=24/2/15 (rd) /BOOT:GRUB /T
+if exist pagersts && echo Example:  MKFATIMG.G4B --CHS=24/2/15 (hd1,0)/BOOTCD.IMG /BOOT:GRLDR /Q
+echo Example:  MKFATIMG.G4B --CHS=24/2/15 (rd) /BOOT:GRLDR /T
 echo Example:  MKFATIMG.G4B (hd1,0)/BOOTCD.IMG /COPY
 if exist pagersts && echo Example:  MKFATIMG.G4B --CHS=1025/64/32 (hd2,0)/MAXCYL.img /V:MAXCYLINDER /BOOT
 if exist pagersts && echo Example:  MKFATIMG.G4B --size=256m /256MFT12.img /V:OVERSIZEF12 /SPC:128 /FAT12
