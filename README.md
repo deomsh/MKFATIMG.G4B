@@ -130,7 +130,7 @@ V0.3: first published version
 ![MKFATIMG G4B -HDDTYPE IMG -D=25 -HEADS=16 -SPT=63 -BOOT -NOTACTIVE](https://github.com/user-attachments/assets/43d1132f-8e49-47c8-ad32-2470ecdcbade)
 
 #### Example of making El Torito Boot Floppy with GRUB Boot Code on Ram-Disk and Image-production afterwards with switch /COPY - more verbose with switch /T
-![MKFATIMG G4B --CHS=24-2-15 (rd) -BOOT=GRUB -T with (hd1,0)-BOOTCD IMG -COPY](https://github.com/user-attachments/assets/9a2bd88b-b16b-4148-a27e-58630fd4c3b8)
+![MKFATIMG G4B --CHS=24-2-15 (rd) -BOOT=GRUB -T with (hd1,0)-BOOTCD IMG -COPY](https://github.com/user-attachments/assets/89465e94-95b6-43f3-829e-18aa8518f284)
 
 #### Example of making partial max CHS-Partition on Ram-Disk with switch /RDSIZE:n (Auto-setting HDD with one unused test cylinder after partition, still FAT32 Partition type 0B)
 ![MKFATIMG G4B --CHS=1025-255-63 (rd) -V=MYMAXCHS8GB -RDSIZE=64m](https://github.com/user-attachments/assets/f52299eb-4512-4cbb-997a-45b40f0153de)
