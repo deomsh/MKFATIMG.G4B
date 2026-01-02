@@ -126,8 +126,8 @@ V0.3: first published version
 #### Example of making Image with Argument --sectors and Long File Name on Root and Auto-settings (here Geometry, HDD and FAT16)
 ![MKFATIMG G4B --sectors=0x100000 ''-Image with max 1m Sectors IMG''](https://github.com/user-attachments/assets/62178710-1cf2-4853-b161-c51b45356768)
 
-#### Example of making preset 'IBM PC AT/ PS/2' (Hard) Disk-Type Image with changed Geometry and set Bootable (default MS-DOS 7) and forced Not-active
-![MKFATIMG G4B -HDDTYPE IMG -D=25 -HEADS=16 -SPT=63 -BOOT -NOTACTIVE](https://github.com/user-attachments/assets/8b99e763-ef3c-49c8-8a21-62666b8c3ba6)
+#### Example of making preset 'IBM PC AT/ PS/2' (Hard) Disk-Type Image with changed Geometry and set Bootable (default MS-DOS 5-7) and forced Not-active
+![MKFATIMG G4B -HDDTYPE IMG -D=25 -HEADS=16 -SPT=63 -BOOT -NOTACTIVE](https://github.com/user-attachments/assets/43d1132f-8e49-47c8-ad32-2470ecdcbade)
 
 #### Example of making El Torito Boot Floppy with GRUB Boot Code on Ram-Disk and Image-production afterwards with switch /COPY - more verbose with switch /T
 ![MKFATIMG G4B --CHS=24-2-15 (rd) -BOOT=GRUB -T with (hd1,0)-BOOTCD IMG -COPY](https://github.com/user-attachments/assets/9a2bd88b-b16b-4148-a27e-58630fd4c3b8)
