@@ -1,9 +1,9 @@
-## MKFATIMG.G4B v0.7 (20250910), by deomsh
+## MKFATIMG.G4B v0.8 (20260102), by deomsh
 <pre><code>Use 1:    MKFATIMG.G4B --size=n|--sectors=N|--CHS=C/H/S FILE switches
-Switches: [/HDD|/FDD] [/FAT12[:nk]|/FAT16[:nk]|/FAT32[:nk]] [/V:VOLUMENAME]
-          [/BOOT[:OS]] [/NOTACTIVE] [/LOG] [/CON] [/R] [/SPT:S] [/HEADS:H]
-          [/ROOTENTR:n] [/RSRV:n] [/SPC:n] [/NOTRM] [/FHD] [/HIDDSEC:n]
-          [/RDBASE:n] [/RDSIZE:n] [/Q|/T] [/Y]
+Switches: [/HDD[:nk|:nm]|/FDD] [/FAT12[:nk]|/FAT16[:nk]|/FAT32[:nk|:nm]]
+          [/V:VOLUMENAME] [/BOOT[:OS]] [/SPC:n] [/RSRV:n] [/ROOTENTR:n]
+          [/HEADS:H] [/SPT:S] [/CON] [/RDBASE:n] [/RDSIZE:n] [/Q|/T] [/Y]
+          [/NOTACTIVE] [/LOG] [/R] [/NOTRM] [/FHD] [/HIDDSEC:n]
 
 Use 2:    MKFATIMG.G4B FILE /F:floppysize switches
 Switches: [/V:VOLUMENAME] [/BOOT[:OS]] [/FAT16|/FAT32] [/CON] [/RSRV:n]
@@ -60,6 +60,18 @@ Use COPYSYS.G4B: https://github.com/deomsh/COPYSYS.G4B
 Copy Ram-Disk afterwards to Image file (see 'Use 4' above)</code></pre> 
 
 ### HISTORY
+V0.8:  
+NEW: Boot Codes for MSDOS2/3, compatible with Grubutil 'fat'  
+NEW: all Boot Codes for MS-DOS based on MSDOS 4.00/ Freedos/ Grldr/ Syslinux  
+NEW: switch /HDD:nk or /HDD:nm to align partition, nk=32k/64k/128k/256k/512k or nm=1m/2m/4m/8m (experimental)
+CHANGE: better FAT32 calculations  
+CHANGE: no E5-vollabel  
+BUGFIX: sometimes wrong Sectors per FAT with switch /rootentr:1263 and above  
+BUGFIX: sometimes negative padding sectors on FAT32  
+BUGFIX: /D:34+ sector echo HEX  
+BUGFIX: --sector=n bad echo  
+BUGFIX: Reserved sectors up to 0xFFFF instead below 0x1000 [typo?]  
+
 V0.7:  
 NEW: with switch /BOOT on Floppy always (newly added) MSWIN4.0 Boot Code, includes WINBOOT.SYS (FAT12/ FAT16 only)  
 NEW: switch /HIDDSEC:n to set (fake) number of hidden sectors on Floppy
