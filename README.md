@@ -112,7 +112,7 @@ V0.3: first published version
 ![MKFATIMG G4B v0 8 VERSION and TEXTSTAT](https://github.com/user-attachments/assets/84419014-6a38-4304-bba1-bf375a583e44)
 
 #### Small Help:
-![MKFATIMG G4B Small-help v0 8](https://github.com/user-attachments/assets/672366da-eaf3-40a4-a23c-867bea465e1c)
+![MKFATIMG G4B Small-help v0 8](https://github.com/user-attachments/assets/c66b6196-8b65-41b9-9daf-8fe6e5f96a69)
 
 #### Example of making Image with Argument --size=n and Auto-settings (here Geometry, HDD and FAT16)
 ![MKFATIMG G4B v0 7 --size=512m (hd0,0)-MYIMAGE IMG (HDD FAT16)](https://github.com/user-attachments/assets/694817ab-2392-44d7-bc83-dfd746bf2ecd)
