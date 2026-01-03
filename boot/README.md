@@ -1,6 +1,6 @@
 ## Compiling NASM Boot Codes
 
-To compile your own NASM boot codes with this project:
+To compile your own NASM boot codes from this project:
 
 1. [Fork this repository](https://github.com/mrexodia/x86-real-mode-bootloader/fork)
 
