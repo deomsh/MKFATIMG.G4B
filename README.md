@@ -115,7 +115,7 @@ V0.3: first published version
 ![MKFATIMG G4B Small-help v0 8](https://github.com/user-attachments/assets/c66b6196-8b65-41b9-9daf-8fe6e5f96a69)
 
 #### Example of making Image with Argument --size=n and Auto-settings (here Geometry, HDD and FAT16)
-![MKFATIMG G4B v0 7 --size=512m (hd0,0)-MYIMAGE IMG (HDD FAT16)](https://github.com/user-attachments/assets/694817ab-2392-44d7-bc83-dfd746bf2ecd)
+![MKFATIMG G4B v0 8 --size=512m (hd0,0)-MYIMAGE IMG (HDD FAT16)](https://github.com/user-attachments/assets/9b906c1b-6231-4505-9a2b-7cc346502102)
 
 #### Example of making preset Floppy Disk Image with switch Volume-name and Contiguous with switch /CON 
 ![MKFATIMG G4B v0 7 (hd0,0)-MyImage IMG -F=2880 -V=F2880KIMAGE (FDD FAT12, contiguous)](https://github.com/user-attachments/assets/45a8c0ec-b7d6-453b-82fb-3d7f831c75e6)
@@ -124,7 +124,7 @@ V0.3: first published version
 ![MKFATIMG G4B --size=2g -H2GFAT16 IMG -V=HDD2GBFAT16 -FAT16 -BOOT](https://github.com/user-attachments/assets/4c0fda97-fb09-44f8-a83e-ecf3721a7830)
 
 #### Example of making Image with Argument --sectors and Long File Name on Root and Auto-settings (here Geometry, HDD and FAT16)
-![MKFATIMG G4B --sectors=0x100000 ''-Image with max 1m Sectors IMG''](https://github.com/user-attachments/assets/62178710-1cf2-4853-b161-c51b45356768)
+![MKFATIMG G4B --sectors=0x100000 &#39;&#39;-Image with max 1m Sectors IMG&#39;&#39;](https://github.com/user-attachments/assets/eee45de1-91cd-4b34-8362-6768551ea695)
 
 #### Example of making preset 'IBM PC AT/ PS/2' (Hard) Disk-Type Image with changed Geometry and set Bootable (default MS-DOS 5-7) and forced Not-active
 ![MKFATIMG G4B -HDDTYPE IMG -D=25 -HEADS=16 -SPT=63 -BOOT -NOTACTIVE](https://github.com/user-attachments/assets/43d1132f-8e49-47c8-ad32-2470ecdcbade)
