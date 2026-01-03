@@ -63,7 +63,7 @@ Copy Ram-Disk afterwards to Image file (see 'Use 4' above)</code></pre>
 V0.8:  
 NEW: Boot Codes for MSDOS2/3, compatible with Grubutil 'fat'  
 NEW: all Boot Codes for MS-DOS based on MSDOS 4.00/ Freedos/ Grldr/ Syslinux  
-NEW: switch /HDD:nk or /HDD:nm to align partition, nk=32k/64k/128k/256k/512k or nm=1m/2m/4m/8m (experimental)
+NEW: switch /HDD:nk or /HDD:nm to align partition, nk=32k/64k/128k/256k/512k or nm=1m/2m/4m/8m (experimental)  
 CHANGE: better FAT32 calculations  
 CHANGE: no E5-vollabel  
 BUGFIX: sometimes wrong Sectors per FAT with switch /rootentr:1263 and above  
