@@ -144,7 +144,7 @@ V0.3: first published version
 
 #### Example of using a partial, aligned LBA-Partition on Ram-Disk with switch /RDSIZE:n to partition and format a fully prepared USB Flash-Drive using dd
 <img width="1049" height="930" alt="SANDISK 64GB USB original with DiskManagement and Settings in VMWare" src="https://github.com/user-attachments/assets/10955e79-d318-4872-86e7-88b0f9fca800" />
-<img width="1920" height="1200" alt="Prepare SANDISK 64GB USB with new FAT32 partition and MSDOS71 System and basic files" src="https://github.com/user-attachments/assets/965eb46b-d593-46af-a9c4-c15cac92af59" />
+<img width="1398" height="1199" alt="Prepare SANDISK 64GB USB with new FAT32 partition and MSDOS71 System and basic files" src="https://github.com/user-attachments/assets/68a153fb-740a-407a-b4ea-16688ad55656" />
 <img width="1392" height="915" alt="SANDISK 64GB USB with new FAT32 partition booted on 960GM-GS3" src="https://github.com/user-attachments/assets/df9f7bf2-baca-4a68-95fe-abecedd539c5" />
 
 
