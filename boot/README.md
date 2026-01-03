@@ -1,17 +1,22 @@
-To compile used NASM Boot Codes make a Fork of: https://github.com/mrexodia/x86-real-mode-bootloader  
-  
-Upload Boot Code to you Fork and add lines for making FILE.bin to Makefile first (all case-sensitive!)  
-  Example:  
-    MSBOOT.bin: MSBOOT.nasm  
-      nasm -f bin MSBOOT.nasm -o MSBOOT.bin  
-  
-To compile use CODESPACE  
-  
-Compile in Terminal with: make FILE.bin  
-  Example: make MSBOOT.bin  
-  
-If downloading binary is a problem, open first in VS Code Desktop.  
+## Compiling NASM Boot Codes
 
+To compile your own NASM boot codes with this project:
 
+1. [Fork this repository](https://github.com/mrexodia/x86-real-mode-bootloader/fork)
 
+2. Add your boot code files to your fork (e.g., `MSBOOT.nasm`)
 
+3. Add a build rule to the Makefile (must use TAB indentation):
+   ```makefile
+   MSBOOT.bin: MSBOOT.nasm
+   	nasm -f bin MSBOOT.nasm -o MSBOOT.bin
+   ```
+
+4. Open GitHub Codespaces or use VS Code with Dev Containers
+
+5. Compile in the terminal:
+   ```bash
+   make MSBOOT.bin
+   ```
+
+**Note**: If you have trouble downloading binaries from Codespaces, use VS Code Desktop instead.
