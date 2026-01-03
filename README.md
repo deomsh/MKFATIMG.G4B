@@ -142,7 +142,7 @@ V0.3: first published version
 #### Example of making partial max LBA-Partition on Ram-Disk with switch /RDSIZE:n (Auto-setting HDD with one unused test cylinder after partition, now FAT32 Partition type 0C)
 ![MKFATIMG G4B v0 8 --size=2048g (rd0) -V=MYMAXLBA2TB -BOOT -RDSIZE=64m,728m](https://github.com/user-attachments/assets/6b7c3df3-52e8-49b4-812b-22d34964954a)
 
-#### Example of using partial max LBA-Partition on Ram-Disk with switch /RDSIZE:n to partition and format an USB Flash-drive with dd
+#### Example of using partial LBA-Partition on Ram-Disk with switch /RDSIZE:n to partition and format a fully prepared USB Flash-Drive with dd
 <img width="1049" height="930" alt="SANDISK 64GB USB original with DiskManagement and Settings in VMWare" src="https://github.com/user-attachments/assets/10955e79-d318-4872-86e7-88b0f9fca800" />
 <img width="1920" height="1200" alt="Prepare SANDISK 64GB USB with new FAT32 partition and MSDOS71 System and basic files" src="https://github.com/user-attachments/assets/965eb46b-d593-46af-a9c4-c15cac92af59" />
 <img width="1392" height="915" alt="SANDISK 64GB USB with new FAT32 partition booted on 960GM-GS3" src="https://github.com/user-attachments/assets/df9f7bf2-baca-4a68-95fe-abecedd539c5" />
