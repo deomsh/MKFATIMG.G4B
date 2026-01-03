@@ -1,0 +1,14 @@
+; boot.cl1: Boot sector messages [2]
+; Changed for NASM by Gemini Pro 2.5
+;
+; MESSAGES FOR THE IBM BOOT SECTOR. NUL Terminated.
+; At this time, for DOS 4.00, we only have maximum 11 bytes left
+; for translation.!!!!!!!!!!!!!!!!!!!!!
+;
+; boot.cl1: Boot sector messages [2]
+SYSMSG  db 'Non-System disk or disk error', 0x0D, 0x0A
+        db 'Replace and press any key when ready...', 0x0D, 0x0A, 0
+;
+;DONE: boot.cl1:1: error: label or instruction expected at start of line
+;DONE: boot.cl1:6: error: label or instruction expected at start of line
+;DONE: boot.cl1:9: error: label or instruction expected at start of line
