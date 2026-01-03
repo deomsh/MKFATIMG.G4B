@@ -138,3 +138,7 @@ V0.3: first published version
 #### Output of FATINFO.G4B and test with FATINFO.G4B /T on FAT32 partition from last example above
 ![FATINFO G4B (rd,0) after MKFATIMG G4B --CHS=1025-255-63 (rd) -V=MYMAXCHS8GB -RDSIZE=64m](https://github.com/user-attachments/assets/2dcc1af2-d906-4a33-8d85-a3e006743f50)
 ![FATINFO G4B (rd,0) -T after MKFATIMG G4B --CHS=1025-255-63 (rd) -V=MYMAXCHS8GB -RDSIZE=64m](https://github.com/user-attachments/assets/501b0a85-9d7d-46c2-9f2e-93e1a0842e64)
+
+#### Example of making partial max LBA-Partition on Ram-Disk with switch /RDSIZE:n (Auto-setting HDD with one unused test cylinder after partition, now FAT32 Partition type 0C)
+![MKFATIMG G4B v0 8 --size=2048g (rd0) -V=MYMAXLBA2TB -BOOT -RDSIZE=64m,728m](https://github.com/user-attachments/assets/6b7c3df3-52e8-49b4-812b-22d34964954a)
+
