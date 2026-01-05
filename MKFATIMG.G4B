@@ -1739,7 +1739,7 @@ if not %result%==0 &; raw write --offset=318 %target%+1 \xEB\xC8\x5E\xAC\x56\xB4
 endlocal && set result=%result%
 goto :eof
 ::
-pbrbootcodeOEMDOS4FAT16
+:pbrbootcodeOEMDOS4FAT16
 #-#+ Based on oemboot805.asm
 setlocal && set *
 set "target=%~1"
