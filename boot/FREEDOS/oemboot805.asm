@@ -1,7 +1,7 @@
 ;    Copyright (C) 2026, deomsh 
 ;   	deomshorg@gmail.com
 ;
-; Modifications (v8.0.5):
+; Modifications v8.0.5 (20260105):
 ;	FAT16 loading fixed above 58 Sectors per FAT
 ;	Missing DL = [drive] before fixed, just before 'pass control to kernel'
 ;	Memory Map updated
