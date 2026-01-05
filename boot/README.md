@@ -2,7 +2,7 @@
 
 To compile your own NASM boot codes with this project:
 
-1. [Fork this repository](https://github.com/mrexodia/x86-real-mode-bootloader/fork)
+1. [Fork this repository](https://github.com/mrexodia/x86-real-mode-bootloader/fork) (mrexodia's 'x86 Real Mode Bootloader')
 2. Add your boot code files to your fork (like `MSBOOT.nasm`)
 3. Add a build rule to the Makefile. The recipe line requires a TAB:
    ```makefile
