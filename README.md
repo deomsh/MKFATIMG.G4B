@@ -1,4 +1,4 @@
-## MKFATIMG.G4B v0.8 (20260102), by deomsh
+## MKFATIMG.G4B v0.8 (20260105), by deomsh
 <pre><code>Use 1:    MKFATIMG.G4B --size=n|--sectors=N|--CHS=C/H/S FILE switches
 Switches: [/HDD[:nk|:nm]|/FDD] [/FAT12[:nk]|/FAT16[:nk]|/FAT32[:nk|:nm]]
           [/V:VOLUMENAME] [/BOOT[:OS]] [/SPC:n] [/RSRV:n] [/ROOTENTR:n]
