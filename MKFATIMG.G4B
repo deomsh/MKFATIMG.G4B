@@ -1,5 +1,5 @@
 !BAT
-#-#+ MKFATIMG.G4B v0.8 (20260105), by deomsh
+#-#+ MKFATIMG.G4B v0.8.1 (20260108), by deomsh
 if "%~1"=="" && echo Use 1:    MKFATIMG.G4B --size=n|--sectors=N|--CHS=C/H/S FILE switches
 if "%~1"=="" && echo Switches: [/HDD[:nk|:nm]|/FDD] [/FAT12[:nk]|/FAT16[:nk]|/FAT32[:nk|:nm]]
 if "%~1"=="" && echo $[]          [/V:VOLUMENAME] [/BOOT[:OS]] [/SPC:n] [/RSRV:n] [/ROOTENTR:n]
@@ -2074,7 +2074,7 @@ goto :eof
 :help
 clear
 pager on
-echo MKFATIMG.G4B v0.8 (20260105), by deomsh
+echo MKFATIMG.G4B v0.8.1 (20260108), by deomsh
 echo Use 1:    MKFATIMG.G4B --size=n|--sectors=N|--CHS=C/H/S FILE switches
 echo && echo Switches: [/HDD[:nk|:nm]|/FDD] [/FAT12[:nk]|/FAT16[:nk]|/FAT32[:nk|:nm]]
 echo $[]          [/V:VOLUMENAME] [/BOOT[:OS]] [/SPC:n] [/RSRV:n] [/ROOTENTR:n]
@@ -2256,4 +2256,5 @@ if not exist pagerstst && goto :eof
 goto :eov
 #FORTESTING#
 #OKE_XXvars##echo -n > (md)0x302+60 && set > (md)0x302+60 && raw cat --locate=\x0A (md)0x302+60 > nul &; echo %0 NUMVARS=%@retval% && cat --locate=\x0A --replace=\x20 (md)0x302+60 && raw cat (md)0x302+60 && echo && echo -n && pause Press a Key to Continue... && echo
+
 
