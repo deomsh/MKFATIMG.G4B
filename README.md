@@ -1,4 +1,4 @@
-## MKFATIMG.G4B v0.8 (20260105), by deomsh
+## MKFATIMG.G4B v0.8.1 (20260108), by deomsh
 <pre><code>Use 1:    MKFATIMG.G4B --size=n|--sectors=N|--CHS=C/H/S FILE switches
 Switches: [/HDD[:nk|:nm]|/FDD] [/FAT12[:nk]|/FAT16[:nk]|/FAT32[:nk|:nm]]
           [/V:VOLUMENAME] [/BOOT[:OS]] [/SPC:n] [/RSRV:n] [/ROOTENTR:n]
@@ -60,6 +60,9 @@ Use COPYSYS.G4B: https://github.com/deomsh/COPYSYS.G4B
 Copy Ram-Disk afterwards to Image file (see 'Use 4' above)</code></pre> 
 
 ### HISTORY
+V0.8.1:  
+BUGFIX: IBMBIO.COM not booting on floppie with /BOOT:MSDOS20  
+
 V0.8:  
 NEW: Boot Codes for MSDOS2/3, compatible with Grubutil 'fat'  
 NEW: all Boot Codes for MS-DOS based on MSDOS 4.00/ Freedos/ Grldr/ Syslinux  
