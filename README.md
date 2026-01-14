@@ -1,4 +1,4 @@
-## MKFATIMG.G4B v0.8.1 (20260108), by deomsh
+## MKFATIMG.G4B v0.8.2 (20260114), by deomsh
 <pre><code>Use 1:    MKFATIMG.G4B --size=n|--sectors=N|--CHS=C/H/S FILE switches
 Switches: [/HDD[:nk|:nm]|/FDD] [/FAT12[:nk]|/FAT16[:nk]|/FAT32[:nk|:nm]]
           [/V:VOLUMENAME] [/BOOT[:OS]] [/SPC:n] [/RSRV:n] [/ROOTENTR:n]
@@ -60,6 +60,10 @@ Use COPYSYS.G4B: https://github.com/deomsh/COPYSYS.G4B
 Copy Ram-Disk afterwards to Image file (see 'Use 4' above)</code></pre> 
 
 ### HISTORY
+V0.8.2:  
+BUGFIX: always set /HDD with switch /LOG and incompatibility with other switches  
+BUGFIX: calculation of Sectors Per FAT12  
+
 V0.8.1:  
 BUGFIX: IBMBIO.COM not booting on floppie with /BOOT:MSDOS20  
 
