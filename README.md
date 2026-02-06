@@ -63,7 +63,7 @@ Copy Ram-Disk afterwards to Image file (see 'Use 4' above)</code></pre>
 ### HISTORY
 V0.8.3:  
 NEW: newest FAT32 Reactos Boot Code  
-NEW: max number of Directory Root Entries raised to 4112 (possible alignment 128+1 sectors on FAT12/16)  
+NEW: max number of Directory Root Entries raised to 4112 (possible alignment 256+1 sectors on FAT12/16)  
 NEW: Boot Code 'MSBOOT60' with Interrupt 13 Extensions  
      To boot MS-DOS 6 (4/5 possible too) from aligned partition: 224 Heads/ 56 Sectors Per Track  
      Use: '/BOOT:MSDOS60'  
