@@ -68,7 +68,7 @@ NEW: Boot Code 'MSBOOT60' with Interrupt 13 Extensions
      To boot MS-DOS 6 (4/5 possible too) from aligned partition: 224 Heads/ 56 Sectors Per Track  
      Use: '/BOOT:MSDOS60'  
 NEW: binary equal MS-DOS 4.0 Boot Code  
-BUGFIX: reserved Directory Root Entries not writen on fat32 above 92 clusters  
+BUGFIX: reserved Directory Root Entries not writen on FAT32 above 92 clusters  
 
 V0.8.2:  
 BUGFIX: always set /HDD with switch /LOG and incompatibility with other switches  
