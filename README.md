@@ -1,4 +1,4 @@
-## MKFATIMG.G4B v0.8.2 (20260114), by deomsh
+## MKFATIMG.G4B v0.8.3 (20260204), by deomsh
 <pre><code>Use 1:    MKFATIMG.G4B --size=n|--sectors=N|--CHS=C/H/S FILE switches
 Switches: [/HDD[:nk|:nm]|/FDD] [/FAT12[:nk]|/FAT16[:nk]|/FAT32[:nk|:nm]]
           [/V:VOLUMENAME] [/BOOT[:OS]] [/SPC:n] [/RSRV:n] [/ROOTENTR:n]
@@ -54,12 +54,22 @@ Grubutil FAT needed in (bd)/%~d0: /, /grub, /boot/grub, /g4dll or current root
 Loosely Linked Libraries: 
 FATLFN.LLL (>=v0.3): https://github.com/deomsh/FATLFN
 ATTRIBFT.LLL (>=v0.9): https://github.com/deomsh/ATTRIBFT.LLL
+Needed to write image with Long File Name
 
 To copy MS-DOS System Files to Ram-Disk first:
 Use COPYSYS.G4B: https://github.com/deomsh/COPYSYS.G4B
 Copy Ram-Disk afterwards to Image file (see 'Use 4' above)</code></pre> 
 
 ### HISTORY
+V0.8.3:  
+NEW: newest FAT32 Reactos Boot Code  
+NEW: max number of Directory Root Entries raised to 4112 (possible alignment 128+1 sectors on FAT12/16)  
+NEW: Boot Code 'MSBOOT60' with Interrupt 13 Extensions  
+     To boot MS-DOS 6 (4/5 possible too) from aligned partition: 224 Heads/ 56 Sectors Per Track  
+     Use: '/BOOT:MSDOS60'  
+NEW: binary equal MS-DOS 4.0 Boot Code  
+BUGFIX: reserved Directory Root Entries not writen on fat32 above 92 clusters  
+
 V0.8.2:  
 BUGFIX: always set /HDD with switch /LOG and incompatibility with other switches  
 BUGFIX: calculation of Sectors Per FAT12  
@@ -116,7 +126,7 @@ New Boot Codes: MSDOS33 and MSDOS40 (in PBR)
 V0.3: first published version  
 
 ### SCREENSHOTS
-![MKFATIMG G4B v0 8 2 VERSION and TEXTSTAT](https://github.com/user-attachments/assets/b3b6afe0-201f-4de8-be9e-8ed1fda72793)
+![MKFATIMG G4B v0 8 3 VERSION and TEXTSTAT](https://github.com/user-attachments/assets/34d3bcfc-64ec-4910-bfb7-7fc1ab2de47f)
 
 #### Small Help:
 ![MKFATIMG G4B Small-help v0 8](https://github.com/user-attachments/assets/c66b6196-8b65-41b9-9daf-8fe6e5f96a69)
