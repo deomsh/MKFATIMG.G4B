@@ -1,4 +1,4 @@
-;    Copyright (C) 2025, deomsh 
+;    Copyright (C) 2026, deomsh 
 ;   	deomshorg@gmail.com
 ;
 ;    This program is free software; you can redistribute it and/or modify
@@ -15,9 +15,9 @@
 ;    along with this program; if not, write to the Free Software
 ;    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ;
-; MSBOOT70.nasm, based on GRLDRFAT.nasm, Originally: GRLDRSTART.S (Part FAT12/16)
+; MSBOOT60.nasm, based on GRLDRFAT.nasm, Originally: GRLDRSTART.S (Part FAT12/16)
 ; Disassembly from: https://shell-storm.org/online/Online-Assembler-and-Disassembler/
-; v.0.3.0 (20251227), prepared for NASM by deomsh
+; v.0.9.0 (20260126), prepared for NASM by deomsh
 ;
 bits		16										; Compiles okay with 'bits 16'
 org			0x7C00
