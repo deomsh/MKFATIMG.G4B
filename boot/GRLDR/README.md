@@ -24,4 +24,4 @@ v0.3.1: reverted to jump EB3C90 because of USB-access problems on Windows 95 OSR
 v0.3.0 First published version, based on GRLDRFAT  
 
 ## MSBOOT71  
-v0.8.0 First published version, based on GRLDRF32  
+v0.26 First published version, based on GRLDRF32  
