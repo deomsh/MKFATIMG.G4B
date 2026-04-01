@@ -1,4 +1,4 @@
-## MKFATIMG.G4B v0.8.3 (20260204), by deomsh
+## MKFATIMG.G4B v0.8.4 (20260401), by deomsh
 <pre><code>Use 1:    MKFATIMG.G4B --size=n|--sectors=N|--CHS=C/H/S FILE switches
 Switches: [/HDD[:nk|:nm]|/FDD] [/FAT12[:nk]|/FAT16[:nk]|/FAT32[:nk|:nm]]
           [/V:VOLUMENAME] [/BOOT[:OS]] [/SPC:n] [/RSRV:n] [/ROOTENTR:n]
@@ -61,6 +61,11 @@ Use COPYSYS.G4B: https://github.com/deomsh/COPYSYS.G4B
 Copy Ram-Disk afterwards to Image file (see 'Use 4' above)</code></pre> 
 
 ### HISTORY
+V0.8.4:  
+NEW: modded FAT12/ FAT16 and FAT32 GRLDR Boot Code (see for changes in folder BOOT)  
+CHANGE: default SYSLINUX MBR used with GRLDR bootcodes  
+CHANGE: Boot Codes MSDOS60 and MSDOS70 reverted to jump EB3C90 because of USB-access problems on Windows 95 OSR2  
+
 V0.8.3:  
 NEW: newest FAT32 Reactos Boot Code  
 NEW: max number of Directory Root Entries raised to 4112 (possible alignment 256+1 sectors on FAT12/16)  
@@ -126,7 +131,7 @@ New Boot Codes: MSDOS33 and MSDOS40 (in PBR)
 V0.3: first published version  
 
 ### SCREENSHOTS
-![MKFATIMG G4B v0 8 3 VERSION and TEXTSTAT](https://github.com/user-attachments/assets/34d3bcfc-64ec-4910-bfb7-7fc1ab2de47f)
+<img width="748" height="703" alt="MKFATIMG G4B v0 8 4 VERSION and TEXTSTAT" src="https://github.com/user-attachments/assets/dd98c6fb-a9ba-4b8b-8639-8e7f84ac7ba6" />
 
 #### Small Help:
 ![MKFATIMG G4B Small-help v0 8](https://github.com/user-attachments/assets/c66b6196-8b65-41b9-9daf-8fe6e5f96a69)
