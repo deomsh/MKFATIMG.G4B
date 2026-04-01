@@ -17,7 +17,7 @@
 ;
 ; MSBOOT60.nasm, based on GRLDRFAT.nasm, Originally: GRLDRSTART.S (Part FAT12/16)
 ; Disassembly from: https://shell-storm.org/online/Online-Assembler-and-Disassembler/
-; v.0.9.0 (20260126), prepared for NASM by deomsh
+; v.0.9.1 (20260401), prepared for NASM by deomsh
 ;
 bits		16										; Compiles okay with 'bits 16'
 org			0x7C00
@@ -71,10 +71,11 @@ File2Offset				equ Dos - $$				; = Dos - 0x7C00
 ;ORG;File2Offset				equ Bio2 - $$				; = Bio2 - 0x7C00
 ;
 DiskErrorMsgOffset		equ DiskErr  - $$			; = DiskErr - 0x7C00
-CommonErrorMsgOffset	equ CommonErr  - $$			; = DiskErr - 0x7C00
+CommonErrorMsgOffset	equ CommonErr  - $$			; = CommonErr - 0x7C00 needed to fix offset at 0x1EE for IO.SYS
 ;
 Entrypoint:
-	jmp		Start									; original 0x3e, now variable if offsets change (MAX: 0x7F for short jump)
+	jmp		DataArea									; original 0x3e, needed in case certain USB drivers want this jump (i.e. WIN95 OSR2 = Tested)
+;<=v0.9.0	jmp		Start									; original 0x3e, now variable if offsets change (MAX: 0x7F for short jump)
 	nop
 	OEM		db	'MSWIN4.1'							; Test v0.1.0
 ; BPB
@@ -98,6 +99,8 @@ Entrypoint:
 	Label	db	'NO NAME    '						; Boot_Vol_Label Offset 0x2B - unused here
 	FileSys	db	'FAT12/16'							; Boot_System_id Offset 36h
 ; --- Data 1 ---
+DataArea:
+                        jmp     Start
 ;NONEED;RootOff		dw	ROOTOFF								; Offset 0000  Offset ...h => [bp + ....] = RootAddress as dword
 ;NONEED;RootSeg		dw	ROOTSEG								; Segment 0050
 ;

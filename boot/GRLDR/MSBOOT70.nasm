@@ -1,4 +1,4 @@
-;    Copyright (C) 2025, deomsh 
+;    Copyright (C) 2026, deomsh 
 ;   	deomshorg@gmail.com
 ;
 ;    This program is free software; you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 ;
 ; MSBOOT70.nasm, based on GRLDRFAT.nasm, Originally: GRLDRSTART.S (Part FAT12/16)
 ; Disassembly from: https://shell-storm.org/online/Online-Assembler-and-Disassembler/
-; v.0.3.0 (20251227), prepared for NASM by deomsh
+; v.0.3.1 (20260401), original GRLDRFAT version prepared for NASM by deomsh
 ;
 bits		16										; Compiles okay with 'bits 16'
 org			0x7C00
@@ -58,10 +58,13 @@ FileErrorMsgOffset		equ FileErr  - $$       	; = FileErr - 0x7C00
 File1Offset				equ Bio - $$				; = Bio - 0x7C00
 File2Offset				equ Bio2 - $$				; = Bio2 - 0x7C00
 DiskErrorMsgOffset		equ DiskErr  - $$			; = DiskErr - 0x7C00
-CommonErrorMsgOffset	equ CommonErr  - $$			; = DiskErr - 0x7C00
+;Unused!;
+CommonErrorMsgOffset	equ CommonErr  - $$			; = CommonErr - 0x7C00 needed to fix offset at 0x1EE for IO.SYS
 ;
 Entrypoint:
-	jmp		Start									; original 0x3e, now variable if offsets change (MAX: 0x7F for short jump)
+;
+	jmp		DataArea									; original 0x3e, now variable if offsets change (MAX: 0x7F for short jump)
+;<=v0.3.0;	jmp		Start									; original 0x3e, now variable if offsets change (MAX: 0x7F for short jump)
 	nop
 	OEM		db	'MSWIN4.1'							; Test v0.1.0
 ; BPB
@@ -85,6 +88,9 @@ Entrypoint:
 	Label	db	'NO NAME    '						; Boot_Vol_Label Offset 0x2B - unused here
 	FileSys	db	'FAT12/16'							; Boot_System_id Offset 36h
 ; --- Data 1 ---
+DataArea:
+;
+		jmp     Start								; second jump to maintain initial jump 'EB 3C 90' to ' trick' some USB-drivers: test with XUSBSUPP on Windows 95 OSR2x
 LoadOff		dw	LOADOFF								; Offset 0000  Offset 18Dh => [bp + 0x18d] = LoadAddress as dword
 LoadSeg		dw	LOADSEG								; Segment 2000
 Int13Al	    db	1									; 
@@ -293,10 +299,12 @@ Extensions:											;
 ; -------------------------
 ; Data 2
 ; -------------------------
-CommonErr	db	0x0d, 0x0a, "Replace disk, press key.."	;
-NewLines    db  0x0d, 0x0a, 0xa, 0					;
-times 494 - ($ - $$) db 0							;
-			dw	CommonErrorMsgOffset				;
+CommonErr	db	0x0d, 0x0a, "Replace disk, press key"	;
+;<=v0.3.0;CommonErr	db	0x0d, 0x0a, "Replace disk, press key.."	;
+NewLines    db  0xa, 0					;
+;v0.3.0;NewLines    db  0x0d, 0x0a, 0xa, 0					;
+;times 494 - ($ - $$) db 0							;
+		dw	CommonErrorMsgOffset				;
 ;*** SUB-ROUTINE *********************************************************************
 Print:												; Should be 12 bytes now: 11 bytes better code + 1 extra byte for 'ret' ( = C3 )
 ; --- prints string DS:SI (modifies AX BX SI) ---
@@ -308,9 +316,12 @@ Print:												; Should be 12 bytes now: 11 bytes better code + 1 extra byte 
 	jmp		Print									; EB F4 (2) Until done
 EndPrint:
 	ret												; C3    (1)
-times 508 - ($ - $$) db 0							;
+;times 510 - ($ - $$) db 0							;
+;times 508 - ($ - $$) db 0							;
 ; Magic Bytes: Win9x uses all 4 bytes as magic value here [Says: Tinybit ??]
+;
 		db	0
+;
 		db	0
 		db	0x55
 		db	0xAA
