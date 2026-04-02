@@ -28,8 +28,8 @@ Features: loads MS-DOS v7 if first four sectors of IO.SYS are contiguous (order 
 
 ## MSBOOT30  
 v30.5.7: first published version, based on MSBOOT  
-Features: Working version, loading all sectors of IO.SYS (load protocol unknown); default Disk Signature at bp+0x1FD = 80h; compatible with Grubutil 'fat'  
+Features: working version, loading all sectors of IO.SYS (load protocol unknown); default Disk Signature at bp+0x1FD = 80h; compatible with Grubutil 'fat'  
 
 ## MSBOOT20  
 First published version, based on MSBOOT30  
-Features: Working version, loading all sectors of IBMBIO.COM; default Disk Signature at bp+0x1FD = 80h; compatible with Grubutil 'fat'  
+Features: working version, loading all sectors of IBMBIO.COM; default Disk Signature at bp+0x1FD = 80h; compatible with Grubutil 'fat'  
