@@ -24,7 +24,7 @@ Features: free placement of IO.SYS' clusters with MS-DOS5xx-MS-DOS6xx (NOT of ro
 
 ## MSBOOT5070  
 v0.13: First published version, based on MSBOOT  
-Features: loads MS-DOS v7 if first four sectors of IO.SYS are contiguous (order of System File root-directory entries must same as with MS-DOS v4-v6); address bp+0x1EE carries address of start of Message Table (MS-DOS v7 LDOS load protocol); further same as MSBOOT50  
+Features: loads MS-DOS v7 if first four sectors of IO.SYS are contiguous (order of System File root-directory entries must same as with MS-DOS v4-v6); address bp+0x1EE carries address of start of Message Table (MS-DOS v7 LDOS load protocol); writes after every sector read a dot on screen; further same as MSBOOT50  
 
 ## MSBOOT30  
 v30.5.7: first published version, based on MSBOOT  
