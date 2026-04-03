@@ -64,7 +64,7 @@ Copy Ram-Disk afterwards to Image file (see 'Use 4' above)</code></pre>
 V0.8.4:  
 NEW: modded FAT12/ FAT16 and FAT32 GRLDR Boot Code (see for changes in folder BOOT)  
 CHANGE: default SYSLINUX MBR used with GRLDR bootcodes  
-CHANGE: Boot Codes MSDOS60 and MSDOS70 reverted to jump EB3C90 because of USB-access problems on Windows 95 OSR2  
+CHANGE: Boot Codes MSDOS60 and MSDOS70 reverted to jump EB3C90 because of USB-access problems on Windows 9x  
 
 V0.8.3:  
 NEW: newest FAT32 Reactos Boot Code  
