@@ -24,7 +24,7 @@ v0.3.1: reverted to jump EB3C90 because of USB-access problems on several Window
 v0.3.0: first published version, based on GRLDRFAT (FAT12/ FAT16)  
 Features: uses INT13h AH=42h extensions if available, will search for WINBOOT.SYS too if IO.SYS is not found; writes after every sector read a dot on screen; error messages on new lines; address bp+0x1EE carries address of start of Message Table (MS-DOS v7 LDOS load protocol)  
 
-## MSDOOT60  
+## MSBOOT60  
 v0.9.1: reverted to jump EB3C90 because of USB-access problems on several Windows 9x USB stack's  
 v0.9.0: first published version, modification of MSBOOT70 (FAT12/ FAT16)  
 Features: can de used on MS-DOS4xx-MS-DOS6xx under the usual conditions; uses INT13h AH=42h extensions if available (usefull with certain disk geometry in case not good recognized by legacy (USB) BIOS - MS-DOS6xx and lower will not use these extension as such); writes after every sector read a dot on screen; error messages on new lines; address bp+0x1EE carries address of start of Message Table (not needed in MS-DOS v6 LDOS load protocol)  
