@@ -16,7 +16,7 @@ Features: MSBOOT.ASM converted to NASM and made binary identical
 
 ## MSBOOT40  
 First published version, based on MSBOOT  
-Features: full NASM code (not binary identcal)  
+Features: full NASM code (not binary identical)  
 
 ## MSBOOT50  
 v0.2: First published version, based on MSBOOT  
