@@ -16,7 +16,7 @@ v11.11: first published version, based on GRLDRF32 (FAT32)
 NEW: dot's during loading (visual and stability issues with USB-legacy boot on N68-chipset); Press Key2reboot added on error; Print of INT13 AH return-code on disk error; moved Data Area.  
 
 ## MSBOOT71  
-v0.26: added Key2reboot function  
+v0.27: added Key2reboot function  
 v0.26: first published version, based on GRLDRF32 (FAT32)  
 Features: writes after every sector read a dot on screen; error messages on new lines; address bp+0x1EE carries address of start of Message Table (not needed in MS-DOS v6 LDOS load protocol)  
 
