@@ -1,5 +1,5 @@
 !BAT
-#-#+ MKFATIMG.G4B v0.8.4 (20260401), by deomsh
+#-#+ MKFATIMG.G4B v0.8.5 (20260405), by deomsh
 if "%~1"=="" && echo Use 1:    MKFATIMG.G4B --size=n|--sectors=N|--CHS=C/H/S FILE switches
 if "%~1"=="" && echo Switches: [/HDD[:nk|:nm]|/FDD] [/FAT12[:nk]|/FAT16[:nk]|/FAT32[:nk|:nm]]
 if "%~1"=="" && echo $[]          [/V:VOLUMENAME] [/BOOT[:OS]] [/SPC:n] [/RSRV:n] [/ROOTENTR:n]
@@ -13,7 +13,8 @@ if "%~1"=="" && echo Use 3:    MKFATIMG.G4B FILE /D:disktype switches
 if "%~1"=="" && echo Switches: [/SPT:S] [/HEADS:H] [/LOG] [/BOOT[:OS]] [/NOTACTIVE] [/R] [/CON]
 if "%~1"=="" && echo $[]          [/FAT12|/FAT16|/FAT32] [/V:VOLUMENAME] [/ROOTENTR:n] [/RSRV:n]
 if "%~1"=="" && echo $[]          [/RDBASE:n] [/RDSIZE:n] [/Q|/T] [/Y]
-if "%~1"=="" && echo Use 4:    MKFATIMG.G4B FILE /COPY [/CON] [/Q|/T] [/Y]
+if "%~1"=="" && echo Use 4:    MKFATIMG.G4B FILE /COPY[:(rd)] [/CON] [/Q|/T] [/Y]
+#ORG#if "%~1"=="" && echo Use 4:    MKFATIMG.G4B FILE /COPY [/CON] [/Q|/T] [/Y]
 #TODO/CHECK#: '/RD:n|FILE2' with '/COPY'
 if "%~1"=="" && echo Help:     MKFATIMG.G4B /?|--?|? && goto :examples
 ## '/BOOT:OS' not functional yet for '/BOOT:OS OS=ZERO'
@@ -66,7 +67,10 @@ if not exist disk && if not exist DISKTYPE && if not exist FLOPTYPE &; if /i "%a
 #NoAutoHEADS/SPT#if not exist disk && if not exist DISKTYPE && if not exist FLOPTYPE &; if /i "%arg%"=="/HDD" && set disk=(hd && shift && goto :argloop ! if /i "%arg%"=="/HDD:64k" && set disk=(hd:64k && shift && goto :argloop ! if /i "%arg%"=="/HDD:1m" && set disk=(hd:1m && shift && goto :argloop ! if /i "%arg:~0,4%"=="/HDD" && echo Switch '%arg%' is not valid && goto :eov
 if not exist contigu &; if /i "%arg%"=="/CON" && set contigu=Y && shift && goto :argloop
 if not exist floppy &; if /i "%arg%"=="/NOTRM" && set floppy=NORM && shift && goto :argloop
+#NEW#
+if not exist ddcopy &; if /i "%arg:~0,6%"=="/COPY:" && if "%arg:~6%"=="(rd)" && set ddcopy=Y && set COPYSRC=(rd) && shift && goto :argloop
 if not exist ddcopy &; if /i "%arg%"=="/COPY" && set ddcopy=Y && shift && goto :argloop
+#####
 if not exist drivenum &; if /i "%arg%"=="/FHD" && set drivenum=x80 && shift && goto :argloop
 if exist active &; if /i "%arg%"=="/NOTACTIVE" && set active= && shift && goto :argloop
 if not exist bootcode &; if /i "%arg%"=="/BOOT" && set bootcode=DEF && shift && goto :argloop
@@ -85,12 +89,20 @@ if not exist Y &; if /i "%arg%"=="/Y" && set Y=Y && shift && goto :argloop
 if not exist RDSIZE && if /i "%arg:~0,8%"=="/RDSIZE:" &; if /i %arg:~8%==MAX && set RDSIZE=MAX ! set RDSIZE=%arg:~8% &; shift && goto :argloop
 if not exist HIDDSEC &; if /i "%arg:~0,9%"=="/HIDDSEC:" && set /A HIDDSEC=%arg:~9% &; if not %HIDDSEC%>=4g && shift && goto :argloop ! echo Switch '%arg%' is not valid && goto :eov
 :endofargloop
+#NEW#
+#OKE#pause "%^~1"=="%~1" ddcopy=%ddcopy% "RAMDISK=%RAMDISK%" COPYSRC=%COPYSRC%
+if %ddcopy%==Y && if not exist RAMDISK && if not exist COPYSRC &; if not "%Q%"=="/Q" && echo Abort: source is unknown, OR variable RAMDISK must exist OR switch '/COPY:(rd)' must used ! set "Q=%Q%" &; set result=0 && goto :eov
+#####
 if exist VOLLABEL && setlocal && call :SFN "FILE" "%VOLLABEL:~0,8%.%VOLLABEL:~8%" &; if %SFN%==N && endlocal && echo Volume label '%VOLLABEL%' is not valid && set result=0 && goto :eov ! endlocal
 if "%Q%"=="/Q" && set "NULL= > nul"
 if not "%~1"=="" &; if not "%Q%"=="/Q" && echo Abort: invalid switch$[0x00]"$[]'%~1'$[0x00]"$[] ! set "Q=%Q%" &; set result=0 && goto :eov
 if %continue%==Y && call :Fn.4 &; set h= && call :Fn.5 0 %v0% &; echo -e -n $[]                                                                              \x20 && call :Fn.5 0 %v0% && set /a v0=%v0%+1 &; if not %v0%==%v% && call :Fn.5 0 %v0% && echo -e -n $[]                                                                              \x20 && call :Fn.5 0 %v0% && set v0= && set v= ! set v0= && set v=
 set arg= && set larg= && set largname= && set ARGNAME= && set ARGEXT= && set rt= && set source= && set srcDRIVE=
-if %ddcopy%==Y && call :ddcopyback "ASK" &; setlocal && %RAMDISK% &; if %result%==1 && if exist %FILE% && if exist rdbase0 && if exist rdsize0 && map --rd-base=%rdbase0% && map --rd-size=%rdsize0% ! set result=%result% &; endlocal && set result=%result% && goto :eov
+#NEW#
+if %ddcopy%==Y && call :ddcopyback "ASK" &; if not exist RAMDISK && goto :eov
+if %ddcopy%==Y && call :ddcopyback "ASK" &; if exist RAMDISK && setlocal && %RAMDISK% &; if %result%==1 && if exist %FILE% && if exist rdbase0 && if exist rdsize0 && map --rd-base=%rdbase0% && map --rd-size=%rdsize0% ! set result=%result% &; endlocal && set result=%result% && goto :eov
+#ORG#if %ddcopy%==Y && call :ddcopyback "ASK" &; setlocal && %RAMDISK% &; if %result%==1 && if exist %FILE% && if exist rdbase0 && if exist rdsize0 && map --rd-base=%rdbase0% && map --rd-size=%rdsize0% ! set result=%result% &; endlocal && set result=%result% && goto :eov
+#####
 if exist LOG && if %disk:~1,2%==fd &; if not "%Q%"=="/Q" && echo Bad argument %LOG% with /FDD ! set "Q=%Q%" &; set result=0 && goto :eov
 if exist LOG && if exist FLOPTYPE &; if not "%Q%"=="/Q" && echo Bad argument %LOG% with /F:%FLOPTYPE% ! set "Q=%Q%" &; set result=0 && goto :eov
 if exist LOG && if not %disk:~1,2%==hd && set disk=(hd
@@ -324,8 +336,12 @@ if not %result%==0 && set result=1
 ## TopMem!
 set /A rdbase=*0x82D0 && set /A rdsize=*0x82D8&0xffffffff &; if %DEVICE%==(rd) && if %result%==1 && set rdbase0=%rdbase% && set rdsize0=%rdsize%
 #LowMemOnly#set /A rdbase=*0x82D0&0xffffffff && set /A rdsize=*0x82D8&0xffffffff
-set "RAMDISK=set imgsize=%imgsize% && set rdbase=%rdbase% && set rdsize=%rdsize% && set disk=%disk% && set LOG=%LOG% && set rdbase0=%rdbase0% && set rdsize0=%rdsize0%"
-if %result%==1 && if exist %FILE% && if exist rdbase0 && if exist rdsize0 &; map --rd-base=%rdbase0% && map --rd-size=%rdsize0%
+#NEW#
+if not exist COPYSRC &; set "RAMDISK=set imgsize=%imgsize% && set rdbase=%rdbase% && set rdsize=%rdsize% && set disk=%disk% && set LOG=%LOG% && set rdbase0=%rdbase0% && set rdsize0=%rdsize0%"
+#ORG#set "RAMDISK=set imgsize=%imgsize% && set rdbase=%rdbase% && set rdsize=%rdsize% && set disk=%disk% && set LOG=%LOG% && set rdbase0=%rdbase0% && set rdsize0=%rdsize0%"
+if not exist COPYSRC &; if %result%==1 && if exist %FILE% && if exist rdbase0 && if exist rdsize0 &; map --rd-base=%rdbase0% && map --rd-size=%rdsize0%
+#ORG#if %result%==1 && if exist %FILE% && if exist rdbase0 && if exist rdsize0 &; map --rd-base=%rdbase0% && map --rd-size=%rdsize0%
+#####
 :eov
 if %result%==0 && if not exist FILE && if exist rdbase0 && if exist rdsize0 &; map --rd-base=%rdbase0% && map --rd-size=%rdsize0%
 call Fn.11 "%INSMOD%" "fat" |; delmod -l fat > nul && delmod fat > nul
@@ -1185,7 +1201,10 @@ endlocal && set reserved=%reserved% && set numfat=%numfat% && set secpfat=%secpf
 goto :eof
 ::
 :makeimagefile
-set "RAMDISK=set imgsize=%imgsize% && set rdbase=%rdbase% && set rdsize=%rdsize% && set disk=%disk% && set LOG=%LOG% && set rdbase0=%rdbase0% && set rdsize0=%rdsize0%"
+#NEW#
+if not exist COPYSRC &; set "RAMDISK=set imgsize=%imgsize% && set rdbase=%rdbase% && set rdsize=%rdsize% && set disk=%disk% && set LOG=%LOG% && set rdbase0=%rdbase0% && set rdsize0=%rdsize0%"
+#ORG#set "RAMDISK=set imgsize=%imgsize% && set rdbase=%rdbase% && set rdsize=%rdsize% && set disk=%disk% && set LOG=%LOG% && set rdbase0=%rdbase0% && set rdsize0=%rdsize0%"
+#####
 setlocal && set * && set Y=%Y% && set "NULL=%NULL%"
 set "FILE=%~1" && set DEVICE=%~d1 && set "PATH=%~p1" && set "NAME=%~n1" && set "EXT=%~x1"
 set /a imgsize=%~2 &; set /a sectbal=%~2>>9 && set /a needKB=%~2>>10+1
@@ -1359,7 +1378,10 @@ goto :eof
 #TODO#if "%~1"=="ASK" &&
 setlocal
 #MAYBE#if exist @uefi && if exist RAMDISK &; setlocal && %RAMDISK% &; endlocal && set disk=%disk% && set LOG=%LOG% && set crc32rd=%crc32rd%
+#NEW#
 if exist RAMDISK &; %RAMDISK% &; if not %imgsize%>=4k && endlocal && set result=0 && set RAMDISK= && set imgsize= && set rdbase= && set rdsize= && goto :eof ! if exist rdsize && set /a rdsect=%rdsize%>>9
+if "%COPYSRC%"=="(rd)" && if not exist RAMDISK && set /A rdbase=*0x82D0&0xffffffffffffffff && set /A rdsize=*0x82D8&0xffffffff &; set imgsize=%rdsize%
+#####
 if exist imgsize && if exist rdsize && if not %imgsize%>=%rdsize% && endlocal && set result=0 && set RAMDISK= && set imgsize= && set rdbase= && set rdsize= && goto :eof
 if exist rdbase && if not %rdbase%>=64m && endlocal && set result=0 && set RAMDISK= && set imgsize= && set rdbase= && set rdsize= && goto :eof
 if exist rdsize && if not %rdsize%>=4k && endlocal && set result=0 && set RAMDISK= && set imgsize= && set rdbase= && set rdsize= && goto :eof
@@ -1817,12 +1839,15 @@ endlocal && set result=%result%
 goto :eof
 ::
 :pbrbootcodeMSBOOT71
-#-# From MSBOOT71.26.nasm
+#-# From MSBOOT71.27.nasm
 setlocal && set *
 set "target=%~1"
-raw write --offset=0 %target%+1 \xEB\x58\x90MSWIN4.1 > nul && set result=1 ! set result=0
-if not %result%==0 &; raw write --offset=90 %target%+1 \xFA\xFC\x31\xC0\xBD\x00\x7C\x89\xEC\x8E\xD0\xFB\x66\x50\x50\x88\x56\x40\xB4\x41\xBB\xAA\x55\xCD\x13\x58\x8E\xD8\x72\x13\x81\xFB\x55\xAA\x75\x0D\xD0\xC9\x73\x09\xC6\x86\xAD\x01\x42\xC6\x46\x02\x0C\x31\xDB\x66\x31\xC0\x66\x89\x46\x5E\x8B\x46\x0E\x66\x03\x46\x1C\x66\x89\x46\x62\x66\x89\x46\x66\x66\x8B\x46\x10\x66\xF7\x66\x24\x66\x01\x46\x66\x66\x8B\x46\x66\x66\x89\x46\xFC\x66\x8B\x46\x2C\x66\x50\xE8\xA3\x00\xBE\xDC\x7D\x0F\x82\x0A\x01\x6A\x70\x07\x06\xE8\xB1\x00\x07\x31\xFF\xB9\x0B\x00\xBE\xE2\x7D\xF3\xA6\x74\x15\x83\xC7\x20\x83\xE7\xE0\x3B\x7E\x0B\x75\xEB\x4A\x75\xDE\x66\x58\xE8\x41\x00\xEB\xCB\x26\xFF\x75\x09\x26\xFF\x75\x0F\x66\x58\x66\x89\x46\x5A\x66\x50\xE8\x60\x00\x73\x15\x8B\x76\x5C\x8B\x7E\x5A\xFF\x36\x7A\x00\xFF\x36\x78\x00\x50\x50\xEA\x00\x02\x70\x00\xE8\x62\x00\x50\x8C\xC0\x3C\xF0\x58\x73\xE0\x4A\x75\xF2\x66\x58\xE8\x02\x00\xEB\xCF\x06\x66\xC1\xE0\x02\x66\x0F\xB7\x5E\x0B\x66\xF7\xF3\x66\x03\x46\x62\xBB\x50\x00\x8E\xC3\x31\xDB\x66\x3B\x46\x5E\x74\x09\x66\x89\x46\x5E\x06\xE8\x2A\x00\x07\x26\x67\x80\x62 > nul && set result=1 ! set result=0
-if not %result%==0 &; raw write --offset=346 %target%+1 \x03\x0F\x26\x66\x67\x8B\x02\x07\xC3\x66\x3D\xF8\xFF\xFF\x0F\xF5\x72\x12\x66\x48\x66\x48\x66\x0F\xB6\x56\x0D\x52\x66\xF7\xE2\x5A\x66\x03\x46\x66\xC3\x66\x60\x66\x31\xD2\x66\x52\x66\x50\x06\x52\x6A\x01\x6A\x10\x66\x31\xC9\x66\xFF\x76\x18\x59\x66\xF7\xF1\x42\x59\x52\x31\xD2\x66\xF7\xF1\x86\xF2\x59\x86\xE8\xC0\xE4\x06\x08\xE1\xB8\x01\x02\x89\xE6\x8A\x16\x40\x7C\x06\x1E\xCD\x13\x58\x8E\xD8\x5B\x72\x10\xB8\x2E\x0E\xCD\x10\x8D\x5F\x20\x8E\xC3\x61\x66\x61\x66\x40\xC3\xBE\xF0\x7D\xAC\xB4\x0E\xCD\x10\x3C\x00\x75\xF7\xEB\xFE\x0D\x0A\x0A\x4E\x6F\x20\x49\x4F\x20\x20\x20\x20\x20\x20\x53\x59\x53\x00\xF0\x01\x0D\x0A\x44\x69\x73\x6B\x20\x45\x72\x72\x6F\x72\x00\x00\x55\xAA > nul && set result=1 ! set result=0
+raw write --offset=0 %target%+1 \xEB\x78\x90MSWIN4.1 > nul && set result=1 ! set result=0
+#v26#raw write --offset=0 %target%+1 \xEB\x58\x90MSWIN4.1 > nul && set result=1 ! set result=0
+if not %result%==0 &; raw write --offset=90 %target%+1 \x4E\x6F\x20\x49\x4F\x20\x20\x20\x20\x20\x20\x53\x59\x53\x20\x45\x72\x72\x6F\x72\x20\x4B\x65\x79\x32\x72\x65\x62\x6F\x6F\x74\x00\xFA\xFC\x31\xC0\xBD\x00\x7C\x89\xEC\x8E\xD0\xFB\x66\x50\x50\x88\x56\x40\xB4\x41\xBB\xAA\x55\xCD\x13\x58\x8E\xD8\x72\x13\x81\xFB\x55\xAA\x75\x0D\xD0\xC9\x73\x09\xC6\x86\xC9\x01\x42\xC6\x46\x02\x0C\x31\xDB\x66\x31\xC0\x66\x89\x46\x7E\x8B\x46\x0E\x66\x03\x46\x1C\x66\x89\x86\x82\x00\x66\x89\x86\x86\x00\x66\x8B\x46\x10\x66\xF7\x66\x24\x66\x01\x86\x86\x00\x66\x8B\x86\x86\x00\x66\x89\x46\xFC\x66\x8B\x46\x2C\x66\x50\xE8\x9A\x00\xBE\x5A\x7C\x0F\x82\x05\x01\x6A\x70\x07\x06\xE8\xA9\x00\x07\x31\xFF\xB9\x0B\x00\xBE\x5D\x7C\xF3\xA6\x74\x15\x83\xC7\x20\x83\xE7\xE0\x3B\x7E\x0B\x75\xEB\x4A\x75\xDE\x66\x58\xE8\x37\x00\xEB\xCB\x26\xFF\x75\x09\x26\xFF\x75\x0F\x66\x58\x66\x89\x46\x7A\x66\x50\xE8\x57\x00\x0F\x82\xBE\x00\xB2\x04\xE8\x6B\x00\xFE\xCA\x75\xF9\x8B\x76\x7C\x8B\x7E\x7A\xFF\x36\x7A\x00\xFF\x36\x78\x00\x50\x50\xEA\x00\x02\x70\x00\x06\x66\xC1\xE0\x02\x66\x0F\xB7\x5E\x0B\x66\xF7\xF3\x66\x03\x86\x82 > nul && set result=1 ! set result=0
+#v26#if not %result%==0 &; raw write --offset=90 %target%+1 \xFA\xFC\x31\xC0\xBD\x00\x7C\x89\xEC\x8E\xD0\xFB\x66\x50\x50\x88\x56\x40\xB4\x41\xBB\xAA\x55\xCD\x13\x58\x8E\xD8\x72\x13\x81\xFB\x55\xAA\x75\x0D\xD0\xC9\x73\x09\xC6\x86\xAD\x01\x42\xC6\x46\x02\x0C\x31\xDB\x66\x31\xC0\x66\x89\x46\x5E\x8B\x46\x0E\x66\x03\x46\x1C\x66\x89\x46\x62\x66\x89\x46\x66\x66\x8B\x46\x10\x66\xF7\x66\x24\x66\x01\x46\x66\x66\x8B\x46\x66\x66\x89\x46\xFC\x66\x8B\x46\x2C\x66\x50\xE8\xA3\x00\xBE\xDC\x7D\x0F\x82\x0A\x01\x6A\x70\x07\x06\xE8\xB1\x00\x07\x31\xFF\xB9\x0B\x00\xBE\xE2\x7D\xF3\xA6\x74\x15\x83\xC7\x20\x83\xE7\xE0\x3B\x7E\x0B\x75\xEB\x4A\x75\xDE\x66\x58\xE8\x41\x00\xEB\xCB\x26\xFF\x75\x09\x26\xFF\x75\x0F\x66\x58\x66\x89\x46\x5A\x66\x50\xE8\x60\x00\x73\x15\x8B\x76\x5C\x8B\x7E\x5A\xFF\x36\x7A\x00\xFF\x36\x78\x00\x50\x50\xEA\x00\x02\x70\x00\xE8\x62\x00\x50\x8C\xC0\x3C\xF0\x58\x73\xE0\x4A\x75\xF2\x66\x58\xE8\x02\x00\xEB\xCF\x06\x66\xC1\xE0\x02\x66\x0F\xB7\x5E\x0B\x66\xF7\xF3\x66\x03\x46\x62\xBB\x50\x00\x8E\xC3\x31\xDB\x66\x3B\x46\x5E\x74\x09\x66\x89\x46\x5E\x06\xE8\x2A\x00\x07\x26\x67\x80\x62 > nul && set result=1 ! set result=0
+if not %result%==0 &; raw write --offset=346 %target%+1 \x00\xBB\x50\x00\x8E\xC3\x31\xDB\x66\x3B\x46\x7E\x74\x09\x66\x89\x46\x7E\x06\xE8\x2B\x00\x07\x26\x67\x80\x62\x03\x0F\x26\x66\x67\x8B\x02\x07\xC3\x66\x3D\xF8\xFF\xFF\x0F\xF5\x72\x13\x66\x48\x66\x48\x66\x0F\xB6\x56\x0D\x52\x66\xF7\xE2\x5A\x66\x03\x86\x86\x00\xC3\x66\x60\x66\x31\xD2\x66\x52\x66\x50\x06\x52\x6A\x01\x6A\x10\x66\x31\xC9\x66\xFF\x76\x18\x59\x66\xF7\xF1\x42\x59\x52\x31\xD2\x66\xF7\xF1\x86\xF2\x59\x86\xE8\xC0\xE4\x06\x08\xE1\xB8\x01\x02\x89\xE6\x8A\x56\x40\x06\x1E\xCD\x13\x58\x8E\xD8\x5B\x72\x10\xB8\x2E\x0E\xCD\x10\x8D\x5F\x20\x8E\xC3\x61\x66\x61\x66\x40\xC3\xBE\x69\x7C\xEB\x02\x69\x00\xB4\x0E\xAC\xCD\x10\x08\xC0\x75\xF9\x98\xCD\x16\xCD\x19\x55\xAA > nul && set result=1 ! set result=0
+#v26#if not %result%==0 &; raw write --offset=346 %target%+1 \x03\x0F\x26\x66\x67\x8B\x02\x07\xC3\x66\x3D\xF8\xFF\xFF\x0F\xF5\x72\x12\x66\x48\x66\x48\x66\x0F\xB6\x56\x0D\x52\x66\xF7\xE2\x5A\x66\x03\x46\x66\xC3\x66\x60\x66\x31\xD2\x66\x52\x66\x50\x06\x52\x6A\x01\x6A\x10\x66\x31\xC9\x66\xFF\x76\x18\x59\x66\xF7\xF1\x42\x59\x52\x31\xD2\x66\xF7\xF1\x86\xF2\x59\x86\xE8\xC0\xE4\x06\x08\xE1\xB8\x01\x02\x89\xE6\x8A\x16\x40\x7C\x06\x1E\xCD\x13\x58\x8E\xD8\x5B\x72\x10\xB8\x2E\x0E\xCD\x10\x8D\x5F\x20\x8E\xC3\x61\x66\x61\x66\x40\xC3\xBE\xF0\x7D\xAC\xB4\x0E\xCD\x10\x3C\x00\x75\xF7\xEB\xFE\x0D\x0A\x0A\x4E\x6F\x20\x49\x4F\x20\x20\x20\x20\x20\x20\x53\x59\x53\x00\xF0\x01\x0D\x0A\x44\x69\x73\x6B\x20\x45\x72\x72\x6F\x72\x00\x00\x55\xAA > nul && set result=1 ! set result=0
 endlocal && set result=%result%
 goto :eof
 ::
@@ -2033,7 +2058,8 @@ echo && echo Use 3:    MKFATIMG.G4B FILE /D:disktype switches
 echo && echo Switches: [/SPT:S] [/HEADS:H] [/LOG] [/BOOT[:OS]] [/NOTACTIVE] [/R] [/CON]
 echo $[]          [/FAT12|/FAT16|/FAT32] [/V:VOLUMENAME] [/ROOTENTR:n] [/RSRV:n]
 echo $[]          [/RDBASE:n] [/Q|/T] [/Y]
-echo && echo Use 4:    MKFATIMG.G4B FILE /COPY [/CON] [/Q|/T] [/Y]
+echo && echo Use 4:    MKFATIMG.G4B FILE /COPY[:(rd)] [/CON] [/Q|/T] [/Y]
+#ORG#echo && echo Use 4:    MKFATIMG.G4B FILE /COPY [/CON] [/Q|/T] [/Y]
 #MAYBE#echo Use 4:    MKFATIMG.G4B FILE /COPY [/CON] [/RD:n|/FILE2] [/Q|/T] [/Y]
 echo && echo Help:     MKFATIMG.G4B /?|--?|?
 echo && echo Only the order of switches is free, all arguments are case-insensitive
@@ -2067,7 +2093,9 @@ echo /D:disktype => disktype: number in range 1-14 or 16-44 (IBM PC AT/ PS/2)
 echo $[] C/H/S of HDD is predefined, size too (Sectors Per Track 17, or 25-39)
 echo $[] Use /HEADS:N and/ or /SPT:S to change partition geometry
 echo && echo Use 4:
-echo /COPY => if set, FULL content of ram-disk will be copied to image-file
+echo /COPY => if set, FULL content of defined ram-disk will be copied to image-file
+echo /COPY:(rd) => FULL content of existing ram-disk will be copied to image-file
+echo $[] use if variable RAMDISK does not exist (anymore)
 echo $[] If image-file not exists, image-file will be created (FAT only: max 4g)
 echo $[] Image-file with wrong size will be deleted and new image will be created
 echo && echo Optional Arguments:
