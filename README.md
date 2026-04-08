@@ -1,4 +1,4 @@
-## MKFATIMG.G4B v0.8.4 (20260401), by deomsh
+## MKFATIMG.G4B v0.8.5 (20260405), by deomsh
 <pre><code>Use 1:    MKFATIMG.G4B --size=n|--sectors=N|--CHS=C/H/S FILE switches
 Switches: [/HDD[:nk|:nm]|/FDD] [/FAT12[:nk]|/FAT16[:nk]|/FAT32[:nk|:nm]]
           [/V:VOLUMENAME] [/BOOT[:OS]] [/SPC:n] [/RSRV:n] [/ROOTENTR:n]
@@ -61,6 +61,10 @@ Use COPYSYS.G4B: https://github.com/deomsh/COPYSYS.G4B
 Copy Ram-Disk afterwards to Image file (see 'Use 4' above)</code></pre> 
 
 ### HISTORY
+v0.8.5  
+NEW: switch /COPY:(rd) to make an image from existing grub4dos ram-drive between 64m and 4g  
+CHANGE: Boot Codes MSDOS71 with Key2reboot function  
+
 V0.8.4:  
 NEW: modded FAT12/ FAT16 and FAT32 GRLDR Boot Code (see for changes in folder BOOT)  
 CHANGE: default SYSLINUX MBR used with GRLDR bootcodes  
