@@ -14,7 +14,7 @@ Switches: [/SPT:S] [/HEADS:H] [/LOG] [/BOOT[:OS]] [/NOTACTIVE] [/R] [/CON]
           [/FAT12|/FAT16|/FAT32] [/V:VOLUMENAME] [/ROOTENTR:n] [/RSRV:n]
           [/RDBASE:n] [/Q|/T] [/Y]
           
-Use 4:    MKFATIMG.G4B FILE /COPY [/CON] [/Q|/T] [/Y]
+Use 4:    MKFATIMG.G4B FILE /COPY[:(rd)] [/CON] [/Q|/T] [/Y]
           
 Help:     MKFATIMG.G4B [/?|--?|?]
 
