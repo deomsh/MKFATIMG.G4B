@@ -6,14 +6,14 @@ CHANGES: FatRead based FATsz16 (number of Sectors Per FAT) instead on TotSec16.
 
 ## GRLDRFAT_MOD  
 v9.14: first published version, based on GRLDRFAT (FAT12/ FAT16)  
-NEW: FAT12/ FAT16 recognition based on number of Total Clusters; dot's during loading (visual and stability issues with USB-legacy boot on N68-chipset); Press Key2reboot added on error; Print of INT13 AH return-code on disk error; moved Data Area.  
+NEW: FAT12/ FAT16 recognition based on number of Total Clusters; dot's during loading (visual aspect and better stability with USB-legacy boot on N68-chipset); Press Key2reboot added on error; Print of INT13 AH return-code on disk error; moved Data Area.  
 
 ## GRLDRF32  
 v9.0: first published version, port of original to nasm (FAT32)  
 
 ## GRLDRF32_MOD  
 v11.11: first published version, based on GRLDRF32 (FAT32)  
-NEW: dot's during loading (visual and stability issues with USB-legacy boot on N68-chipset); Press Key2reboot added on error; Print of INT13 AH return-code on disk error; moved Data Area.  
+NEW: dot's during loading (visual and better stability with USB-legacy boot on N68-chipset); Press Key2reboot added on error; Print of INT13 AH return-code on disk error; moved Data Area.  
 
 ## MSBOOT71  
 v0.27: added Key2reboot function  
