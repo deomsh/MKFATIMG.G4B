@@ -18,7 +18,7 @@ NEW: dot's during loading (visual and stability issues with USB-legacy boot on N
 ## MSBOOT71  
 v0.27: added Key2reboot function  
 v0.26: first published version, based on GRLDRF32 (FAT32)  
-Features: writes after every sector read a dot on screen; error messages on new lines; address bp+0x1EE carries address of start of Message Table (not needed in MS-DOS v6 LDOS load protocol)  
+Features: writes after every sector read a dot on screen; error messages on new lines; address bp+0x1EE carries address of start of Message Table (MS-DOS v7 LDOS load protocol)  
 
 ## MSBOOT70  
 v0.3.1: reverted to jump EB3C90 because of USB-access problems on several Windows 9x USB stack's  
