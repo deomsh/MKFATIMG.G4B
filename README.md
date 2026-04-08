@@ -63,7 +63,7 @@ Copy Ram-Disk afterwards to Image file (see 'Use 4' above)</code></pre>
 ### HISTORY
 v0.8.5  
 NEW: switch /COPY:(rd) to make an image from existing grub4dos ram-drive between 64m and 4g  
-CHANGE: Boot Codes MSDOS71 with Key2reboot function  
+CHANGE: Boot Code MSDOS71 with Key2reboot function  
 
 V0.8.4:  
 NEW: modded FAT12/ FAT16 and FAT32 GRLDR Boot Code (see for changes in folder BOOT)  
