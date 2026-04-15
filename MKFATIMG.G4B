@@ -2045,7 +2045,7 @@ goto :eof
 :help
 clear
 pager on
-echo MKFATIMG.G4B v0.8.3 (20260204), by deomsh
+echo MKFATIMG.G4B v0.8.5 (20260405), by deomsh
 echo Use 1:    MKFATIMG.G4B --size=n|--sectors=N|--CHS=C/H/S FILE switches
 echo && echo Switches: [/HDD[:nk|:nm]|/FDD] [/FAT12[:nk]|/FAT16[:nk]|/FAT32[:nk|:nm]]
 echo $[]          [/V:VOLUMENAME] [/BOOT[:OS]] [/SPC:n] [/RSRV:n] [/ROOTENTR:n]
