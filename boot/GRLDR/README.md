@@ -21,7 +21,7 @@ v0.26: first published version, based on GRLDRF32 (FAT32)
 Features: writes after every sector read a dot on screen; error messages on new lines; address bp+0x1EE carries address of start of Message Table (MS-DOS v7 LDOS load protocol)  
 
 ## MSBOOT70  
-v0.3.1: reverted to jump EB3C90 because of USB-access problems on several Windows 9x USB stack's  
+v0.3.1: reverted to jump EB3C90 because of USB-access problems on several Windows 9x USB stack's (cost: no full new lines)  
 v0.3.0: first published version, based on GRLDRFAT (FAT12/ FAT16)  
 Features: uses INT13h AH=42h extensions if available, will search for WINBOOT.SYS too if IO.SYS is not found; writes after every sector read a dot on screen; error messages on new lines; address bp+0x1EE carries address of start of Message Table (MS-DOS v7 LDOS load protocol); reboot with Key  
 
